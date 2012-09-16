@@ -1,5 +1,7 @@
 var fs         = require('fs'),
     exec       = require('child_process').exec,
+    node_config = require("./lib/nodeconfig_devserver"),
+
     sys        = require('sys'),
     path       = require('path'),
     http       = require('http'),
@@ -8,10 +10,8 @@ var fs         = require('fs'),
 
 var PUBLIC = path.join(path.dirname(__filename), 'public');
 var devmode = false;
-var port = 8126;
-if (devmode){
-  port = 8124;
-}
+var port = node_config.port;
+
 var statuses = {};
 var progresses = {};
 var metadata   = {};

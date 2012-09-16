@@ -1,0 +1,8 @@
+#!/bin/bash
+
+./node_modules/forever/bin/forever \
+start \
+-al ../logs/fielddbaudio.log \
+-ao out.log \
+-ae err.log \
+service.js
