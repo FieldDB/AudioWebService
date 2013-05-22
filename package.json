@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "dependencies": {
     "paperboy": "latest",
-    "forever": "latest"
+    "forever": "latest",
+    "corsproxy": "latest",
+    "http-proxy": "latest"
   }
 }
