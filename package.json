@@ -2,6 +2,7 @@
   "name": "FieldDBAudioService",
   "version": "0.0.1",
   "dependencies": {
-    "paperboy": "latest"
+    "paperboy": "latest",
+    "forever": "latest"
   }
 }
