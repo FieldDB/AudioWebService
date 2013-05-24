@@ -5,6 +5,7 @@
     "paperboy": "latest",
     "forever": "latest",
     "corsproxy": "latest",
-    "http-proxy": "latest"
+    "http-proxy": "latest",
+    "fs.extra": "~1.2.0"
   }
 }
