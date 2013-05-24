@@ -20,7 +20,7 @@ app.configure(function() {
 });
 
 app.listen(3188);
-
+console.log("AudioWebService listening on port 3188");
 // API calls
 
 app
@@ -29,7 +29,12 @@ app
         function(req, res) {
 
           console.log("Got to my upload API");
-
+          if(!req.files){
+            res.send({
+              error : 'No files sent.'
+            });
+            return;
+          }
           var filesToUpload = req.files.filesToUpload[0];
 
           console.log(filesToUpload);
@@ -82,21 +87,22 @@ app.post('/textgrids', function(req, res) {
   console.log("got to my textgrid API");
   console.log(req.body);
 
-  res.writeHead(200, {
-    'content-type' : 'application/json'
-  });
-
-  res.write(JSON.stringify({
+  /*
+   * TODO check to see if the text grids on couchdb are built with these materials?
+   * YES: return the textgrids
+   * NO: run it again
+   */
+  res.send({
     'textGrids' : [ {
+      corpus : {},
       filename : "test_audio.wav",
       textGrid : "hi"
     }, {
+      corpus : {},
       filename : "test_audio2.wav",
       textGrid : "hi"
     } ]
-  }));
-
-  res.end();
+  });
 
 });
 
