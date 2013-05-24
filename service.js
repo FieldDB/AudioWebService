@@ -1,195 +1,180 @@
-var fs         = require('fs'),
-    exec       = require('child_process').exec,
-    node_config = require("./lib/nodeconfig_devserver"),
+var sys = require('sys');
+var exec = require('child_process').exec;
+var path = require('path');
+var express = require('express');
+var app = express();
 
-    sys        = require('sys'),
-    path       = require('path'),
-    http       = require('http'),
-    formidable = require('./lib/formidable'),
-    paperboy   = require('./lib/paperboy');
+// Configuration
 
-var PUBLIC = path.join(path.dirname(__filename), 'public');
-var devmode = false;
-var port = node_config.port;
+app.configure(function() {
+  app.use(express.logger());
+  app.use(express.compress());
+  app.use(express.bodyParser({
+    hash : 'md5'
+  }));
+  app.use(express.errorHandler({
+    dumpExceptions : true,
+    showStack : true
+  }));
+});
 
-var statuses = {};
-var progresses = {};
-var metadata   = {};
+app.listen(3188);
 
-var child;
+// API calls
 
-function puts(error, stdout, stderr) { sys.puts(stdout) };
-function logsAndFlagsFresh(error,uuid,stdout,stderr){
-  sys.puts(stdout);
-  var setFresh = function(){
-    statuses[uuid]="transcription fresh";
-    sys.print("\nProcessed uuid: "+uuid+" set to: "+statuses[uuid]+"\n\n");
-  }
-  return setFresh;
-};
+app.post('/upload', function(req, res) {
 
+  console.log("Got to my upload API");
+  console.log(req.body);
 
-http.createServer(function(req, res) {
-  /*TODO check for API key and non banned install id in this regex */
-  regex = new RegExp('/upload/(.+)');
-  match = regex.exec(req.url);
-  if (match && req.method.toLowerCase() == 'post') {
-    var uuid = match[1];
-    uuid = uuid.replace(/.mp3/,"");
-    uuid = uuid.replace(/.srt/,"");
-    uuid = uuid.replace(/_client/,"");
-    uuid = uuid.replace(/_server/,"");
-    sys.print("Receiving transcription request: "+uuid+'\n');
-    
-    var form = new formidable.IncomingForm();
-    form.uploadDir = './data';
-    form.keepExtensions = true;
+  var filesToUpload = req.files.filesToUpload[0];
+  var fs = require('fs.extra');
+  var p1 = "../storage/audio/";
+  var p2 = "../storage/dictionaries/";
+  var p3 = "../Prosodylab-Aligner/tmp/";
+  var p4 = "../Prosodylab-Aligner/";
 
-    // keep track of progress.
-    form.addListener('progress', function(recvd, expected) {
-      progress = (recvd / expected * 100).toFixed(2);
-      progresses[uuid] = progress;
-    });
+  console.log(filesToUpload);
 
-    form.parse(req, function(error, fields, files) {
-      var path     = files['file']['path'],
-          filename = files['file']['filename'],
-          mime     = files['file']['mime'];
-      sys.print('Users file: '+filename + ':filename\nIs server file: ' + path +  ':path\n');
-
-      /*
-       * Rename to original name (sanitize, although it shoudl already be sanitized by the android client.)
-       */
-      var safeFilename=filename.replace(/[^\w\.]/g,"_");
-      safeFilename=safeFilename.replace(/[;:|@&*/\\]/g,"_");
-      //safeFilename=safeFilename.replace(/_client\./,".");
-      safeFilename=safeFilename.replace(/\.mp3/,".amr");
-      var tempdir = "../nodejs-pocketsphinxtemp/";
-      fs.renameSync(path,tempdir+safeFilename);
-      safeFilenameServer = safeFilename.replace(/_client/,"_server");
-      
-      var subtitleregex = new RegExp('(.+).srt');
-      var matchsubtitle = subtitleregex.exec(filename);
-      res.writeHead(200, {'content-type': 'text/html'});
-      if(matchsubtitle){
-        if(statuses[uuid] === "dictation recieved"){
-          res.write("Transcription machine is thinking...\n");
-        }else{
-          res.write("Server is Processing.\n");
-        }
-        res.write(filename + ':filename\n' + path + ':path\n');
-       //not using closure to set fresh, instead, running sphinx every time the user uploads the srt of the same uuid. this lets the user control the transcription more.
-        if (statuses[uuid] === "dictation received" || statuses[uuid] === "transcription nothing fresh" ){
-          var runTranscription = function(uuid) { 
-            var uuidchange = uuid; //local variable bound by closure
-            exec("sh audio2text.sh "+ safeFilename.replace(/_client\.srt/,""),puts);
-            var setFresh = function(){
-              statuses[uuidchange]="transcription fresh";
-              sys.print("Processed uuid: "+uuidchange+" set to: "+statuses[uuidchange]);
+  for ( var i in filesToUpload) {
+    (function(index) {
+      var a = filesToUpload[index];
+      switch (a.type) {
+      case "audio/wav":
+        fs.copy(a.path, p1 + a.name, function(error) {
+          if (error) {
+            throw error;
+          }
+          console.log("Successfully copied " + a.name + " to " + p1);
+          fs.copy(a.path, p3 + a.name, function(error) {
+            if (error) {
+              throw error;
             }
-            //http://stackoverflow.com/questions/111102/how-do-javascript-closures-work
-            return setFresh; 
-          }
-          var resultFresh = runTranscription(uuid);
-          setTimeout(resultFresh,30000); //this is running before exec finishes.
-        }
-        
-        /*
-         * copy the file to the response, if the status was dictation received
-         * and we just got the client .srt, then thi should copy the client .srt
-         * with the timecode from audio2text saying that the transcription
-         * will apear below when it is ready
-         *
-         * other wise if the transcription is fresh it will provide 
-         * the transcription
-         */
-        fs.readFile(tempdir+safeFilenameServer,"binary", function(err, file){
-          if(err){
-            //res.sendHeader(500, {"Content-Type": "text/plain"});
-            sys.print("There was an err reading the file"+err+"\nReturning nothing to the user\n");
-            //res.write("The machine transcription hasn't returned any hypotheses yet.\n");
-            //sys.print("The machine transcription hasn't returned any hypotheses yet.\n");
-
-          }else{
-            sys.print("\nReturning the machine transcription to the user.\n");
-            sys.print("___________________________+++_____________________\n");
-            res.write(file,"binary");
-            res.end();
-            sys.print(file);
-            sys.print("___________________________+++_____________________\n");
-            exec("date",puts);
-            sys.print("Returned above transcription to user.\n");
-          }
+            console.log("Successfully copied " + a.name + " to " + p3);
+            fs.unlink(a.path,
+                function(error) {
+                  if (error) {
+                    throw error;
+                  }
+                  console.log("Successfully removed " + a.name + " from "
+                      + a.path);
+                });
+          });
         });
-        statuses[uuid]="transcription nothing fresh"
-        sys.print("Server's transcription was returned to client. "+'\n');
-      }else{
-        //if the user just sent an mp3/amr
-        res.write("Dictation sent for transcription.\n");
-        res.write(filename + ':filename\n' + path + ':path\n');
-        res.end();
-        statuses[uuid]="dictation received";
+        break;
+      case "audio/mp3":
+        fs.copy(a.path, p1 + a.name, function(error) {
+          if (error) {
+            throw error;
+          }
+          console.log("Successfully copied " + a.name + " to " + p1);
+          fs.copy(a.path, p3 + a.name, function(error) {
+            if (error) {
+              throw error;
+            }
+            console.log("Successfully copied " + a.name + " to " + p3);
+            fs.unlink(a.path,
+                function(error) {
+                  if (error) {
+                    throw error;
+                  }
+                  console.log("Successfully removed " + a.name + " from "
+                      + a.path);
+                });
+          });
+        });
+        break;
+      case "text/plain":
+        fs.copy(a.path, p2 + a.name, function(error) {
+          if (error) {
+            throw error;
+          }
+          console.log("Successfully copied " + a.name + " to " + p2);
+          fs.copy(a.path, p3 + a.name, function(error) {
+            if (error) {
+              throw error;
+            }
+            console.log("Successfully copied " + a.name + " to " + p3);
+            fs.unlink(a.path,
+                function(error) {
+                  if (error) {
+                    throw error;
+                  }
+                  console.log("Successfully removed " + a.name + " from "
+                      + a.path);
+                });
+          });
+        });
+        break;
+      case "application/octet-stream":
+        fs.rename(a.path, p3 + a.name, function(error) {
+          if (error) {
+            throw error;
+          }
+          console.log("Successfully copied " + a.name + " to " + p3);
+          console.log("Successfully removed " + a.name + " from " + a.path);
+        });
+        break;
       }
-      exec("date",puts);
-      sys.print("\tFinished upload processing."+'\n');
-    });
-    
-    return;
+    })(i);
   }
 
-  // (update) metadata
-  regex = new RegExp('/update/(.+)');
-  match = regex.exec(req.url);
-  if (match && req.method.toLowerCase() == 'post') {
-    uuid = match[1];
-    var form = new formidable.IncomingForm();
-    form.addListener('field', function(name, value) {
-      sys.print("fresh metadata for "+uuid+": "+name+" => "+value+"\n")
-      metadata[name] = value;
-    });
-    form.parse(req);
-  }
-  // respond to status queries
-  regex = new RegExp('/status/(.+)');
-  match = regex.exec(req.url);
-  if (match) {
-    uuid = match[1];
-    uuid = uuid.replace(/.mp3/,"");
-    uuid = uuid.replace(/.srt/,"");
-    uuid = uuid.replace(/_client/,"");
-    uuid = uuid.replace(/_server/,"");
+  // var firstFile = filesToUpload[0];
+  // var serverPath = '/upload/' + firstFile.name;
+  //
+  // require('fs')
+  // .rename(
+  // firstFile.path,
+  // '/home/jdhorner/fielddbworkspace/Prosodylab-Aligner/tmp'
+  // + serverPath,
+  // function(error) {
+  //
+  // if (error) {
+  // res.send({
+  // error : 'Ah crap! Something bad happened'
+  // });
+  // return;
+  // }
 
-    res.writeHead(200, {'content-type': 'application/json'});
-    res.write(JSON.stringify({'status': statuses[uuid]}));
-    res.end();
-    
-    exec("date",puts);
-    sys.print(uuid+"\nReplied to status request: "+JSON.stringify({'status': statuses[uuid]}));
-    sys.print("\n\n");
-  }
+  var command = 'cd /home/jdhorner/fielddbworkspace/'
+      + 'Prosodylab-Aligner && ./align.py -d ./tmp/dictionary.txt ./tmp';
+  var child = exec(command, function(err, stdout, stderr) {
+    if (err)
+      throw err;
+    else {
+      console.log("generated textgrid");
+      var p = path.resolve("../Prosodylab-Aligner/tmp/testing_audio.TextGrid");
+      res.download(p, "testing_audio.TextGrid");
+    }
+  });
 
-  // respond to progress queries.
-  regex = new RegExp('/progress/(.+)');
-  match = regex.exec(req.url);
-  if (match) {
-    uuid = match[1];
-    res.writeHead(200, {'content-type': 'application/json'});
-    res.write(JSON.stringify({'progress': progresses[uuid]}));
-    res.end();
-  }
+});
 
-  // let paperboy handle any static content.
-  paperboy
-    .deliver(PUBLIC, req, res)
-    .after(function(statCode) {
-      sys.log('Served Request: ' + statCode + ' ' + req.url)
-    })
-    .otherwise(function() {
-      res.writeHead(404, {'Content-Type': 'text/plain'});
-      res.write('Not Found');
-      res.end();
-    });
+app.post('/textgrids', function(req, res) {
 
-}).listen(port);
+  console.log("got to my textgrid API");
+  console.log(req.body);
 
-sys.log('ready at http://localhost:'+port+'/')
+  res.writeHead(200, {
+    'content-type' : 'application/json'
+  });
+
+  res.write(JSON.stringify({
+    'textGrids' : [ {
+      filename : "test_audio.wav",
+      textGrid : "hi"
+    }, {
+      filename : "test_audio2.wav",
+      textGrid : "hi"
+    } ]
+  }));
+
+  res.end();
+
+});
+
+app.post('/progress', function(req, res) {
+
+  console.log("got to my progress API");
+
+});
