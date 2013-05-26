@@ -4,8 +4,7 @@
   "dependencies": {
     "paperboy": "latest",
     "forever": "latest",
-    "corsproxy": "latest",
-    "http-proxy": "latest",
+    "cors": "latest",
     "fs.extra": "~1.2.0"
   }
 }

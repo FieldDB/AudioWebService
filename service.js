@@ -1,12 +1,22 @@
+var https = require('https');
+var node_config = require("./lib/nodeconfig_devserver");
 var sys = require('sys');
 var exec = require('child_process').exec;
 var path = require('path');
 var express = require('express');
+var cors = require('cors');
 var app = express();
 
-// Configuration
+/*
+ * Cross Origin Resource Sharing (CORS) Configuration, needed for for all HTML5
+ * clients running on any domain to contact this webservice.
+ */
+var corsOptions = {
+  origin : true
+};
 
 app.configure(function() {
+  app.use(cors());
   app.use(express.logger());
   app.use(express.compress());
   app.use(express.bodyParser({
@@ -18,10 +28,18 @@ app.configure(function() {
   }));
 });
 
-app.listen(3188);
-console.log("AudioWebService listening on port 3188");
-// API calls
+/*
+ * HTTPS Configuration, needed for for all HTML5 chrome app clients to contact
+ * this webservice. As well as a general security measure.
+ */
+var fs = require('fs');
+node_config.httpsOptions.key = fs.readFileSync(node_config.httpsOptions.key);
+node_config.httpsOptions.cert = fs.readFileSync(node_config.httpsOptions.cert);
+https.createServer(node_config.httpsOptions, app).listen(node_config.port);
+console.log("AudioWebService listening on port " + node_config.port);
 
+// API calls
+app.options('/upload', cors()); // enable preflight request for DELETE request
 app.post('/upload', function(req, res) {
 
   console.log("Got to my upload API");
@@ -136,7 +154,7 @@ app.post('/upload', function(req, res) {
   // return;
   // }
 
-  var command = 'cd /home/jdhorner/fielddbworkspace/'
+  var command = 'cd $HOME/fielddbworkspace/'
       + 'Prosodylab-Aligner && ./align.py -d ./tmp/dictionary.txt ./tmp';
   var child = exec(command, function(err, stdout, stderr) {
     if (err)
@@ -156,9 +174,8 @@ app.post('/textgrids', function(req, res) {
   console.log(req.body);
 
   /*
-   * TODO check to see if the text grids on couchdb are built with these materials?
-   * YES: return the textgrids
-   * NO: run it again
+   * TODO check to see if the text grids on couchdb are built with these
+   * materials? YES: return the textgrids NO: run it again
    */
   res.send({
     'textGrids' : [ {
@@ -175,7 +192,7 @@ app.post('/textgrids', function(req, res) {
 });
 
 app.post('/progress', function(req, res) {
-
+  res.send("50");
   console.log("got to my progress API");
 
 });
