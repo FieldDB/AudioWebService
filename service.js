@@ -83,7 +83,7 @@ app.post('/upload/extract/utterances', function(req, res) {
     else {
       console.log('Generated mp3 file');
       // var p = 'https://prosody.linguistics.mcgill.ca/audio/' + destination + filename + '.mp3';
-      var p = 'http://192.168.3.108:3184/' + destination + '/' + filename + '.mp3';
+      var p = 'https://voicedev.lingsync.org/' + destination + '/' + filename + '.mp3';
       console.log('sent path: ' + p);
       res.send({url: p});
     }
