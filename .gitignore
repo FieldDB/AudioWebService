@@ -9,7 +9,12 @@ compiled_handlebars.js
 # Ignore natural lib 
 public/libs/natural/
 
-.wav
+*.wav
+*.mp3
+*.mp4
+*.mov
+*.3gp
+*.TextGrid
 audio_stimuli
 
 .idea
