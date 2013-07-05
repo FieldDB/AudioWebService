@@ -1,5 +1,5 @@
 var https = require('https');
-var node_config = require("./lib/nodeconfig_devserver");
+var node_config = require("./lib/nodeconfig_production");
 var sys = require('sys');
 var exec = require('child_process').exec;
 var path = require('path');
@@ -91,15 +91,6 @@ app.post('/upload/extract/utterances', function(req, res) {
 
 });
 
-// app.get('/utterances/:id/video', function(req, res) {
-
-//   var folder = req.params.id;
-//   var path = 'utterances/' + folder + '/';
-
-//   res.send(path);
-
-// });
-
 app.get('/utterances/:id', function(req, res) {
 
   var folder = req.params.id;
@@ -108,12 +99,6 @@ app.get('/utterances/:id', function(req, res) {
   res.sendfile(path);
 
 });
-
-// app.get('/utterances', function(req, res) {
-
-//   res.send();
-
-// });
 
 app.post('/upload', function(req, res) {
 
@@ -259,6 +244,6 @@ var fss = require('fs');
 node_config.httpsOptions.key = fss.readFileSync(node_config.httpsOptions.key);
 node_config.httpsOptions.cert = fss.readFileSync(node_config.httpsOptions.cert);
 
-// https.createServer(node_config.httpsOptions, app).listen(node_config.port);
-app.listen(node_config.port);
+https.createServer(node_config.httpsOptions, app).listen(node_config.port);
+// app.listen(node_config.port);
 console.log('AudioWebService listening on port ' + node_config.port);
