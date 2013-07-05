@@ -55,7 +55,7 @@ app.post('/upload/extract/utterances', function(req, res) {
     return (i < 0) ? f : f.substring(0, i);
   }
 
-  if (!req.files.videoFile) {
+  if (!req.files) {
     return res.send(404);
   }
 
