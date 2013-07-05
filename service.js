@@ -21,10 +21,10 @@ app.configure(function() {
   app.use(express.favicon());
   app.use(express.compress());
   app.use(express.logger());
-  app.use(express.static(__dirname + '/utterances'));
-  // app.use('/test', express.directory(__dirname + '/utterances'));
   app.use(express.limit(262144000));  // 250mb
   app.use(express.bodyParser({hash: 'md5'}));
+  app.use('/utterances', express.directory(__dirname + '/utterances'));
+  app.use('/utterances', express.static(__dirname + '/utterances'));
   app.use(express.methodOverride());
   app.use(express.errorHandler({
     dumpExceptions: true,
@@ -87,21 +87,12 @@ app.post('/upload/extract/utterances', function(req, res) {
       throw err;
     else {
       console.log('Generated mp3 file');
-      // var p = 'https://prosody.linguistics.mcgill.ca/audio/' + destination + filename + '.mp3';
-      var p = 'https://voicedev.lingsync.org/' + destination + '/' + filename + '.mp3';
+      var p = 'https://speechdev.lingsync.org/' + destination;
+      // var p = 'http://localhost:3184/' + destination;
       console.log('sent path: ' + p);
       res.send({url: p});
     }
   });
-
-});
-
-app.get('/utterances/:id', function(req, res) {
-
-  var folder = req.params.id;
-  var path = 'utterances/' + folder + '/' + folder + '.mp3';
-
-  res.sendfile(path);
 
 });
 
@@ -249,6 +240,6 @@ var fss = require('fs');
 node_config.httpsOptions.key = fss.readFileSync(node_config.httpsOptions.key);
 node_config.httpsOptions.cert = fss.readFileSync(node_config.httpsOptions.cert);
 
-https.createServer(node_config.httpsOptions, app).listen(node_config.port);
-// app.listen(node_config.port);
+// https.createServer(node_config.httpsOptions, app).listen(node_config.port);
+app.listen(node_config.port);
 console.log('AudioWebService listening on port ' + node_config.port);

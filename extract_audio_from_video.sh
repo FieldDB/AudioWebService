@@ -13,5 +13,6 @@ echo "Conversion complete."
 if [ ! "$(command -v praat)" ]; then
   exit 0
 else
-  praat $PRAAT/praat-script-extract-utterances.praat $WORK/ /*.mp3
+ # praat $PRAAT/praat-script-extract-utterances.praat $WORK/ /*.mp3
+  praat $PRAAT/praat-script-syllable-nuclei-v2file.praat -26 0.1 0.4 yes $WORK $1.mp3 2>&1
 fi
