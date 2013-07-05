@@ -23,6 +23,7 @@ app.configure(function() {
   app.use(express.logger());
   app.use(express.static(__dirname + '/utterances'));
   // app.use('/test', express.directory(__dirname + '/utterances'));
+  app.use(express.limit(262144000));  // 250mb
   app.use(express.bodyParser({hash: 'md5'}));
   app.use(express.methodOverride());
   app.use(express.errorHandler({
