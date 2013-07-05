@@ -55,6 +55,10 @@ app.post('/upload/extract/utterances', function(req, res) {
     return (i < 0) ? f : f.substring(0, i);
   }
 
+  if (!req.files.videoFile) {
+    return res.send(404);
+  }
+
   var movie = req.files.videoFile;
   var fs = require('fs-extra');
   var filename = getName(movie.name);
