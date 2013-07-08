@@ -65,30 +65,36 @@ app.post('/upload/extract/utterances', function(req, res) {
   var filename = getName(movie.name);
   var destination = 'utterances/' + filename;
 
-  fs.mkdirsSync(destination, function(error) {
-    if (error) {
-      throw error;
+  fs.exists(destination, function(exists) {
+    if (exists) {
+      console.log('The file: ' + movie.name + ' already exists in: ' + destination);
+      return res.send('Already exists.');
     } else {
-      console.log('Successfully created subfolder');
-    }
-  });
-
-  fs.renameSync(movie.path, destination + '/' + movie.name, function(error) {
-    if (error) {
-      throw error;
-    } else {
-      console.log('Successfully copied ' + movie.name + ' to ' + destination);
+      fs.mkdirs(destination, function(error) {
+        if (error) {
+          throw error;
+        } else {
+          console.log('Successfully created subfolder: ' + destination);
+          fs.rename(movie.path, destination + '/' + movie.name, function(error) {
+            if (error) {
+              throw error;
+            } else {
+              console.log('Successfully copied ' + movie.name + ' to ' + destination);
+            }
+          });
+        }
+      });
     }
   });
 
   var command = './extract_audio_from_video.sh ' + filename + ' ' + movie.name;
   var child = exec(command, function(err, stdout, stderr) {
-    if (err)
+    if (err) {
       throw err;
-    else {
+    } else {
       console.log('Generated mp3 file');
       var p = 'https://speechdev.lingsync.org/' + destination;
-      // var p = 'http://localhost:3184/' + destination;
+      // var p = 'http://192.168.3.108:3184/' + destination;
       console.log('sent path: ' + p);
       res.send({url: p});
     }
