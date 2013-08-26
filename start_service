@@ -2,7 +2,7 @@
 
 ./node_modules/forever/bin/forever \
 start \
--al ../logs/fielddbaudio.log \
+-al ../fielddbworkspace/logs/fielddbaudio.log \
 -ao out.log \
 -ae err.log \
 service.js

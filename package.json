@@ -5,6 +5,8 @@
     "paperboy": "latest",
     "forever": "latest",
     "cors": "latest",
-    "fs.extra": "~1.2.0"
+    "fs.extra": "~1.2.0",
+    "express": "~3.3.2",
+    "fs-extra": "~0.6.3"
   }
 }
