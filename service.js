@@ -3,6 +3,7 @@ var node_config = require("./lib/nodeconfig_production");
 var sys = require('sys');
 var exec = require('child_process').exec;
 var path = require('path');
+var fs = require('fs');
 var express = require('express');
 //var cors = require('cors');
 var app = express();
@@ -238,13 +239,42 @@ app.post('/progress', function(req, res) {
 
 });
 
+
+app.get('/videofilenames', function(req, res) {
+
+  console.log('got to the videofilenames API');
+  var dir = 'utterances/'; // your directory
+
+  // var files = fs.readdirSync(dir);
+  // files.sort(function(a, b) {
+  //   return fs.statSync(dir + a).mtime.getTime() -
+  //     fs.statSync(dir + b).mtime.getTime();
+  // });
+  /* cached version */
+  var files = fs.readdirSync(dir)
+    .map(function(v) {
+      return {
+        name: v,
+        time: fs.statSync(dir + v).mtime.getTime()
+      };
+    })
+    .sort(function(a, b) {
+      return a.time - b.time;
+    })
+    .map(function(v) {
+      return v.name;
+    });
+    console.log(files);
+    res.send(files);
+});
+
+
 /*
  * HTTPS Configuration, needed for for all HTML5 chrome app clients to contact
  * this webservice. As well as a general security measure.
  */
-var fss = require('fs');
-node_config.httpsOptions.key = fss.readFileSync(node_config.httpsOptions.key);
-node_config.httpsOptions.cert = fss.readFileSync(node_config.httpsOptions.cert);
+node_config.httpsOptions.key = fs.readFileSync(node_config.httpsOptions.key);
+node_config.httpsOptions.cert = fs.readFileSync(node_config.httpsOptions.cert);
 
 // https.createServer(node_config.httpsOptions, app).listen(node_config.port);
 app.listen(node_config.port);

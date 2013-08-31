@@ -1,0 +1,22 @@
+body{
+  color: #fff;
+  text-align: center;
+  font-family: 'Lobster Two', cursive;
+  background-color: #000;
+}
+.video_thumb {
+  border: solid 1px transparent;
+  padding: 3px;
+  cursor: pointer;
+  display:inline-block;
+}
+
+.video_thumb.active {
+  border: solid 1px #333;
+}
+
+.playlist { 
+  text-align: center;
+  height: 100px;
+  overflow: auto;
+  }
