@@ -61,7 +61,8 @@ app.post('/upload/extract/utterances', function(req, res) {
     return res.send(404);
   }
 
-  var movie = req.files.videoFile;
+  var movie = req.files.videoFile ? req.files.videoFile : req.files.files[0];
+  console.log(movie);
   var fs = require('fs-extra');
   var filename = getName(movie.name);
   var destination = 'utterances/' + filename;
@@ -115,9 +116,10 @@ app.post('/upload', function(req, res) {
   var p3 = '../Prosodylab-Aligner/tmp/';
   var p4 = '../Prosodylab-Aligner/';
 
-  console.log(filesToUpload);
-
+  console.log(req.files);
+  var currentFileName  = "audiofilename";
   for (var i in filesToUpload) {
+    
     (function(index) {
       var a = filesToUpload[index];
       switch (a.type) {
@@ -196,15 +198,20 @@ app.post('/upload', function(req, res) {
       }
     })(i);
   }
-
+ 
+ try{
+  currentFileName = filesToUpload[0].name.substring(0,filesToUpload[0].name.lastIndexOf("."));
+ } catch(e){
+  console.loge(e);
+ }
   var command = 'cd $HOME/fielddbworkspace/' + 'Prosodylab-Aligner && ./align.py -d ./tmp/dictionary.txt ./tmp';
   var child = exec(command, function(err, stdout, stderr) {
     if (err)
       throw err;
     else {
       console.log('generated textgrid');
-      var p = path.resolve('../Prosodylab-Aligner/tmp/testing_audio.TextGrid');
-      res.download(p, 'testing_audio.TextGrid');
+      var p = path.resolve('../Prosodylab-Aligner/tmp/' + currentFileName + '.TextGrid');
+      res.download(p, currentFileName+'.TextGrid');
     }
   });
 
