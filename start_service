@@ -1,8 +1,13 @@
 #!/bin/bash
 
-./node_modules/forever/bin/forever \
+cd $FIELDDB_HOME/AudioWebService
+#bash switch_to_producti.sh
+
+$FIELDDB_HOME/AudioWebService/node_modules/forever/bin/forever \
 start \
--al ../fielddbworkspace/logs/fielddbaudio.log \
--ao out.log \
--ae err.log \
+-al $FIELDDB_HOME/logs/fielddbaudio.log \
+-ao $FIELDDB_HOME/logs/fielddbaudioout.log \
+-ae $FIELDDB_HOME/logs/fielddbaudioerr.log \
 service.js
+
+
