@@ -204,7 +204,7 @@ app.post('/upload', function(req, res) {
  } catch(e){
   console.loge(e);
  }
-  var command = 'cd $HOME/fielddbworkspace/' + 'Prosodylab-Aligner && ./align.py -d ./tmp/dictionary.txt ./tmp';
+  var command = 'cd $FIELDDB_HOME/' + 'Prosodylab-Aligner && ./align.py -d ./tmp/dictionary.txt ./tmp';
   var child = exec(command, function(err, stdout, stderr) {
     if (err)
       throw err;
@@ -283,6 +283,6 @@ app.get('/videofilenames', function(req, res) {
 node_config.httpsOptions.key = fs.readFileSync(node_config.httpsOptions.key);
 node_config.httpsOptions.cert = fs.readFileSync(node_config.httpsOptions.cert);
 
-// https.createServer(node_config.httpsOptions, app).listen(node_config.port);
+//https.createServer(node_config.httpsOptions, app).listen(node_config.port);
 app.listen(node_config.port);
 console.log('AudioWebService listening on port ' + node_config.port);
