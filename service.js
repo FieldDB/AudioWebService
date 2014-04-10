@@ -1,9 +1,12 @@
 var https = require('https');
-var node_config = require("./lib/nodeconfig_production");
+var node_config = require("./lib/nodeconfig_local");
+var audio = require("./lib/audio");
 var sys = require('sys');
 var exec = require('child_process').exec;
+var shellPromises = require("./lib/shellPromises");
 var path = require('path');
 var fs = require('fs');
+var TextGrid = require('./lib/TextGrid').TextGrid;
 var express = require('express');
 //var cors = require('cors');
 var app = express();
@@ -17,13 +20,40 @@ var app = express();
 //  origin : "*",
 //  methods : "GET,PUT,POST"
 //};
+try {
+    fs.mkdirSync(node_config.audioVideoCacheDir, function(data) {
+        console.log("mkdir callback " + data);
+    });
+} catch (e) {
+    if (e.errno !== 47) {
+        console.log(e);
+    } else {
+        console.log("Dir was already ready.");
+    }
+}
+try {
+    fs.mkdirSync(node_config.audioVideoDataDir, function(data) {
+        console.log("mkdir callback " + data);
+    });
+} catch (e) {
+    if (e.errno !== 47) {
+        console.log(e);
+    } else {
+        console.log("Dir was already ready.");
+    }
+}
+
 
 app.configure(function() {
   app.use(express.favicon());
   app.use(express.compress());
   app.use(express.logger());
   app.use(express.limit(262144000));  // 250mb
-  app.use(express.bodyParser({hash: 'md5'}));
+  app.use(express.bodyParser({
+    hash: 'sha1',
+    checksum: 'sha1',
+    uploadDir: node_config.audioVideoCacheDir
+  }));
   app.use('/utterances', express.directory(__dirname + '/utterances'));
   app.use('/utterances', express.static(__dirname + '/utterances'));
   app.use(express.methodOverride());
@@ -49,8 +79,10 @@ app.configure(function() {
 //API calls
 //app.options('/upload', cors()); // enable preflight
 //app.post('/upload', cors(corsOptions), function(req, res) {
-
 app.post('/upload/extract/utterances', function(req, res) {
+  var audioVideoFileDetails,
+    dbname,
+    textGridCommand;
 
   function getName(f) {
     var i = f.lastIndexOf('.');
@@ -61,49 +93,37 @@ app.post('/upload/extract/utterances', function(req, res) {
     return res.send(404);
   }
 
-  var movie = req.files.videoFile ? req.files.videoFile : req.files.files[0];
-  console.log(movie);
-  var fs = require('fs-extra');
-  var filename = getName(movie.name);
-  var destination = 'utterances/' + filename;
+  audioVideoFileDetails = req.files.videoFile ? req.files.videoFile : req.files.files[0];
+  dbname = req.body.dbname;
 
-  fs.exists(destination, function(exists) {
-    if (exists) {
-      console.log('The file: ' + movie.name + ' already exists in: ' + destination);
-      return res.send('Already exists.');
-    } else {
-      fs.mkdirs(destination, function(error) {
-        if (error) {
-          throw error;
-        } else {
-          console.log('Successfully created subfolder: ' + destination);
-          fs.rename(movie.path, destination + '/' + movie.name, function(error) {
-            if (error) {
-              throw error;
-            } else {
-              console.log('Successfully copied ' + movie.name + ' to ' + destination);
-            }
+  console.log("Generating Wav");
+  audio.createWavAudioFromUpload(audioVideoFileDetails, dbname, node_config.audioVideoDataDir)
+    .then(function(result) {
+        audioVideoFileDetails = result;
+
+        console.log("Generating TextGrid");
+        textGridCommand = node_config.praatCommand + __dirname + "/praatfiles/praat-script-syllable-nuclei-v2file.praat -26 0.1 0.4 yes " + audioVideoFileDetails.workingDir + " " + audioVideoFileDetails.fileBaseName + ".wav "; //+ " 2>&1 ";
+        delete audioVideoFileDetails.workingDir;
+        delete audioVideoFileDetails.uploadFileId;
+
+        shellPromises.execute(textGridCommand)
+          .then(function(results) {
+            console.log(results);
+          }, function(reason) {
+            console.log("Error");
+            console.log(reason);
           });
-        }
+      },
+      function(reason) {
+        console.log("Error");
+        console.log(reason);
+      })
+    .fin(function() {
+      res.send({
+        result: audioVideoFileDetails
       });
-    }
-  });
-
-  var command = './extract_audio_from_video.sh ' + filename + ' ' + movie.name;
-  var child = exec(command, function(err, stdout, stderr) {
-    if (err) {
-      throw err;
-    } else {
-      console.log('Generated mp3 file');
-      var p = 'https://speechdev.lingsync.org/' + destination;
-      // var p = 'http://192.168.3.108:3184/' + destination;
-      console.log('sent path: ' + p);
-      res.send({url: p});
-    }
-  });
-
+    });
 });
-
 app.post('/upload', function(req, res) {
 
   console.log('Got to my upload API');
@@ -283,6 +303,6 @@ app.get('/videofilenames', function(req, res) {
 node_config.httpsOptions.key = fs.readFileSync(node_config.httpsOptions.key);
 node_config.httpsOptions.cert = fs.readFileSync(node_config.httpsOptions.cert);
 
-//https.createServer(node_config.httpsOptions, app).listen(node_config.port);
-app.listen(node_config.port);
+https.createServer(node_config.httpsOptions, app).listen(node_config.port);
+//app.listen(node_config.port);
 console.log('AudioWebService listening on port ' + node_config.port);

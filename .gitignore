@@ -41,6 +41,8 @@ lib-cov
 pids
 logs
 results
+cache
+data
 
 node_modules
 npm-debug.log
