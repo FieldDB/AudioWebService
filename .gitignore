@@ -43,6 +43,8 @@ logs
 results
 cache
 data
+rawdata
+bycorpus
 
 node_modules
 npm-debug.log

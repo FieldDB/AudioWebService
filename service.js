@@ -21,7 +21,7 @@ var app = express();
 //  methods : "GET,PUT,POST"
 //};
 try {
-    fs.mkdirSync(node_config.audioVideoCacheDir, function(data) {
+    fs.mkdirSync(node_config.audioVideoRawDir, function(data) {
         console.log("mkdir callback " + data);
     });
 } catch (e) {
@@ -32,7 +32,7 @@ try {
     }
 }
 try {
-    fs.mkdirSync(node_config.audioVideoDataDir, function(data) {
+    fs.mkdirSync(node_config.audioVideoByCorpusDir, function(data) {
         console.log("mkdir callback " + data);
     });
 } catch (e) {
@@ -50,9 +50,10 @@ app.configure(function() {
   app.use(express.logger());
   app.use(express.limit(262144000));  // 250mb
   app.use(express.bodyParser({
-    hash: 'sha1',
-    checksum: 'sha1',
-    uploadDir: node_config.audioVideoCacheDir
+    hash: 'md5',
+    autoFiles: 'true',
+    multiples: 'true'
+    // uploadDir: node_config.audioVideoRawDir
   }));
   app.use('/utterances', express.directory(__dirname + '/utterances'));
   app.use('/utterances', express.static(__dirname + '/utterances'));
@@ -80,39 +81,66 @@ app.configure(function() {
 //app.options('/upload', cors()); // enable preflight
 //app.post('/upload', cors(corsOptions), function(req, res) {
 app.post('/upload/extract/utterances', function(req, res) {
-  var audioVideoFileDetails,
+  var audioVideoFiles = [],
     dbname,
+    token,
     textGridCommand;
 
-  function getName(f) {
-    var i = f.lastIndexOf('.');
-    return (i < 0) ? f : f.substring(0, i);
+  token = req.body.token;
+  if (!token || !token.trim()) {
+    res.statusCode = 403;
+    return res.send({
+      error: "Forbidden you are not permitted to upload files."
+    });
   }
 
-  if (!req.files) {
-    return res.send(404);
+  username = req.body.username;
+  if (!username || !username.trim()) {
+    res.statusCode = 403;
+    return res.send({
+      error: "Forbidden you are not permitted to upload files."
+    });
   }
 
-  audioVideoFileDetails = req.files.videoFile ? req.files.videoFile : req.files.files[0];
   dbname = req.body.dbname;
+  if (!dbname || !dbname.trim()) {
+    res.statusCode = 422;
+    return res.send({
+      error: "No database name was specified, upload cannot be processed."
+    });
+  }
 
-  console.log("Generating Wav");
-  audio.createWavAudioFromUpload(audioVideoFileDetails, dbname, node_config.audioVideoDataDir)
+  if (req.files.videoFile) {
+    audioVideoFiles.push(req.files.videoFile);
+  } else if (req.files.files && req.files.files.length > 0) {
+    audioVideoFiles = req.files.files;
+  } else {
+    res.statusCode = 422;
+    return res.send({
+      error: "No files were attached."
+    });
+  }
+
+
+  console.log("Generating wavs");
+  audio.createWavAudioFromUpload(audioVideoFiles, dbname, node_config.audioVideoByCorpusDir)
     .then(function(result) {
-        audioVideoFileDetails = result;
+        audioVideoFiles = result;
 
         console.log("Generating TextGrid");
-        textGridCommand = node_config.praatCommand + __dirname + "/praatfiles/praat-script-syllable-nuclei-v2file.praat -26 0.1 0.4 yes " + audioVideoFileDetails.workingDir + " " + audioVideoFileDetails.fileBaseName + ".wav "; //+ " 2>&1 ";
-        delete audioVideoFileDetails.workingDir;
-        delete audioVideoFileDetails.uploadFileId;
+        for (var fileindex = 0; fileindex < audioVideoFiles.length; fileindex++) {
+          textGridCommand = node_config.praatCommand + __dirname + "/praatfiles/praat-script-syllable-nuclei-v2file.praat -26 0.1 0.4 yes " + audioVideoFiles[fileindex].workingDir + " " + audioVideoFiles[fileindex].fileBaseName + ".wav "; //+ " 2>&1 ";
+          delete audioVideoFiles[fileindex].workingDir;
+          delete audioVideoFiles[fileindex].uploadFileId;
 
-        shellPromises.execute(textGridCommand)
-          .then(function(results) {
-            console.log(results);
-          }, function(reason) {
-            console.log("Error");
-            console.log(reason);
-          });
+          shellPromises.execute(textGridCommand)
+            .then(function(textgridResults) {
+              console.log(textgridResults);
+            }, function(reason) {
+              console.log("Error");
+              console.log(reason);
+            });
+        }
       },
       function(reason) {
         console.log("Error");
@@ -120,10 +148,12 @@ app.post('/upload/extract/utterances', function(req, res) {
       })
     .fin(function() {
       res.send({
-        result: audioVideoFileDetails
+        result: audioVideoFiles
       });
     });
 });
+
+
 app.post('/upload', function(req, res) {
 
   console.log('Got to my upload API');
