@@ -6,7 +6,6 @@ var exec = require('child_process').exec;
 var shellPromises = require("./lib/shellPromises");
 var path = require('path');
 var fs = require('fs');
-var TextGrid = require('./lib/TextGrid').TextGrid;
 var express = require('express');
 //var cors = require('cors');
 var app = express();
@@ -21,26 +20,26 @@ var app = express();
 //  methods : "GET,PUT,POST"
 //};
 try {
-    fs.mkdirSync(node_config.audioVideoRawDir, function(data) {
-        console.log("mkdir callback " + data);
-    });
+  fs.mkdirSync(node_config.audioVideoRawDir, function(data) {
+    console.log("mkdir callback " + data);
+  });
 } catch (e) {
-    if (e.errno !== 47) {
-        console.log(e);
-    } else {
-        console.log("Dir was already ready.");
-    }
+  if (e.errno !== 47) {
+    console.log(e);
+  } else {
+    console.log("Dir was already ready.");
+  }
 }
 try {
-    fs.mkdirSync(node_config.audioVideoByCorpusDir, function(data) {
-        console.log("mkdir callback " + data);
-    });
+  fs.mkdirSync(node_config.audioVideoByCorpusDir, function(data) {
+    console.log("mkdir callback " + data);
+  });
 } catch (e) {
-    if (e.errno !== 47) {
-        console.log(e);
-    } else {
-        console.log("Dir was already ready.");
-    }
+  if (e.errno !== 47) {
+    console.log(e);
+  } else {
+    console.log("Dir was already ready.");
+  }
 }
 
 
@@ -48,7 +47,7 @@ app.configure(function() {
   app.use(express.favicon());
   app.use(express.compress());
   app.use(express.logger());
-  app.use(express.limit(262144000));  // 250mb
+  app.use(express.limit(262144000)); // 250mb
   app.use(express.bodyParser({
     hash: 'md5',
     autoFiles: 'true',
@@ -123,24 +122,14 @@ app.post('/upload/extract/utterances', function(req, res) {
 
 
   console.log("Generating wavs");
-  audio.createWavAudioFromUpload(audioVideoFiles, dbname, node_config.audioVideoByCorpusDir)
+  audio.createWavAudioFromUpload(audioVideoFiles, dbname, node_config.audioVideoRawDir, node_config.audioVideoByCorpusDir)
     .then(function(result) {
         audioVideoFiles = result;
 
         console.log("Generating TextGrid");
-        for (var fileindex = 0; fileindex < audioVideoFiles.length; fileindex++) {
-          textGridCommand = node_config.praatCommand + __dirname + "/praatfiles/praat-script-syllable-nuclei-v2file.praat -26 0.1 0.4 yes " + audioVideoFiles[fileindex].workingDir + " " + audioVideoFiles[fileindex].fileBaseName + ".wav "; //+ " 2>&1 ";
-          delete audioVideoFiles[fileindex].workingDir;
-          delete audioVideoFiles[fileindex].uploadFileId;
-
-          shellPromises.execute(textGridCommand)
-            .then(function(textgridResults) {
-              console.log(textgridResults);
-            }, function(reason) {
-              console.log("Error");
-              console.log(reason);
-            });
-        }
+        // for (var fileindex = 0; fileindex < audioVideoFiles.length; fileindex++) {
+        //   //TODO
+        // }
       },
       function(reason) {
         console.log("Error");
@@ -167,93 +156,93 @@ app.post('/upload', function(req, res) {
   var p4 = '../Prosodylab-Aligner/';
 
   console.log(req.files);
-  var currentFileName  = "audiofilename";
+  var currentFileName = "audiofilename";
   for (var i in filesToUpload) {
-    
+
     (function(index) {
       var a = filesToUpload[index];
       switch (a.type) {
-      case 'audio/wav':
-        fs.copy(a.path, p1 + a.name, function(error) {
-          if (error) {
-            throw error;
-          }
-          console.log('Successfully copied ' + a.name + ' to ' + p1);
-          fs.copy(a.path, p3 + a.name, function(error) {
+        case 'audio/wav':
+          fs.copy(a.path, p1 + a.name, function(error) {
             if (error) {
               throw error;
             }
-            console.log('Successfully copied ' + a.name + ' to ' + p3);
-            fs.unlink(a.path,
+            console.log('Successfully copied ' + a.name + ' to ' + p1);
+            fs.copy(a.path, p3 + a.name, function(error) {
+              if (error) {
+                throw error;
+              }
+              console.log('Successfully copied ' + a.name + ' to ' + p3);
+              fs.unlink(a.path,
                 function(error) {
                   if (error) {
                     throw error;
                   }
                   console.log('Successfully removed ' + a.name + ' from ' + a.path);
                 });
+            });
           });
-        });
-        break;
-      case 'audio/mp3':
-        fs.copy(a.path, p1 + a.name, function(error) {
-          if (error) {
-            throw error;
-          }
-          console.log('Successfully copied ' + a.name + ' to ' + p1);
-          fs.copy(a.path, p3 + a.name, function(error) {
+          break;
+        case 'audio/mp3':
+          fs.copy(a.path, p1 + a.name, function(error) {
             if (error) {
               throw error;
             }
-            console.log('Successfully copied ' + a.name + ' to ' + p3);
-            fs.unlink(a.path,
+            console.log('Successfully copied ' + a.name + ' to ' + p1);
+            fs.copy(a.path, p3 + a.name, function(error) {
+              if (error) {
+                throw error;
+              }
+              console.log('Successfully copied ' + a.name + ' to ' + p3);
+              fs.unlink(a.path,
                 function(error) {
                   if (error) {
                     throw error;
                   }
                   console.log('Successfully removed ' + a.name + ' from ' + a.path);
                 });
+            });
           });
-        });
-        break;
-      case 'text/plain':
-        fs.copy(a.path, p2 + a.name, function(error) {
-          if (error) {
-            throw error;
-          }
-          console.log('Successfully copied ' + a.name + ' to ' + p2);
-          fs.copy(a.path, p3 + a.name, function(error) {
+          break;
+        case 'text/plain':
+          fs.copy(a.path, p2 + a.name, function(error) {
             if (error) {
               throw error;
             }
-            console.log('Successfully copied ' + a.name + ' to ' + p3);
-            fs.unlink(a.path,
+            console.log('Successfully copied ' + a.name + ' to ' + p2);
+            fs.copy(a.path, p3 + a.name, function(error) {
+              if (error) {
+                throw error;
+              }
+              console.log('Successfully copied ' + a.name + ' to ' + p3);
+              fs.unlink(a.path,
                 function(error) {
                   if (error) {
                     throw error;
                   }
                   console.log('Successfully removed ' + a.name + ' from ' + a.path);
                 });
+            });
           });
-        });
-        break;
-      case 'application/octet-stream':
-        fs.rename(a.path, p3 + a.name, function(error) {
-          if (error) {
-            throw error;
-          }
-          console.log('Successfully copied ' + a.name + ' to ' + p3);
-          console.log('Successfully removed ' + a.name + ' from ' + a.path);
-        });
-        break;
+          break;
+        case 'application/octet-stream':
+          fs.rename(a.path, p3 + a.name, function(error) {
+            if (error) {
+              throw error;
+            }
+            console.log('Successfully copied ' + a.name + ' to ' + p3);
+            console.log('Successfully removed ' + a.name + ' from ' + a.path);
+          });
+          break;
       }
     })(i);
   }
- 
- try{
-  currentFileName = filesToUpload[0].name.substring(0,filesToUpload[0].name.lastIndexOf("."));
- } catch(e){
-  console.loge(e);
- }
+
+  try {
+    currentFileName = filesToUpload[0].name.substring(0, filesToUpload[0].name.lastIndexOf("."));
+  } catch (e) {
+    console.loge(e);
+  }
   var command = 'cd $FIELDDB_HOME/' + 'Prosodylab-Aligner && ./align.py -d ./tmp/dictionary.txt ./tmp';
   var child = exec(command, function(err, stdout, stderr) {
     if (err)
@@ -261,7 +250,7 @@ app.post('/upload', function(req, res) {
     else {
       console.log('generated textgrid');
       var p = path.resolve('../Prosodylab-Aligner/tmp/' + currentFileName + '.TextGrid');
-      res.download(p, currentFileName+'.TextGrid');
+      res.download(p, currentFileName + '.TextGrid');
     }
   });
 
@@ -277,7 +266,7 @@ app.post('/textgrids', function(req, res) {
    * materials? YES: return the textgrids NO: run it again
    */
   res.send({
-    'textGrids' : [{
+    'textGrids': [{
       corpus: {},
       filename: 'test_audio.wav',
       textGrid: 'hi'
@@ -321,8 +310,8 @@ app.get('/videofilenames', function(req, res) {
     .map(function(v) {
       return v.name;
     });
-    console.log(files);
-    res.send(files);
+  console.log(files);
+  res.send(files);
 });
 
 
