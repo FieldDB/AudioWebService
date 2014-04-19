@@ -83,62 +83,81 @@ app.post('/upload/extract/utterances', function(req, res) {
   var audioVideoFiles = [],
     dbname,
     token,
-    textGridCommand;
+    textGridCommand,
+    returnJSON;
 
   token = req.body.token;
   if (!token || !token.trim()) {
     res.statusCode = 403;
-    return res.send({
+    returnJSON = {
+      status: 403,
       error: "Forbidden you are not permitted to upload files."
-    });
+    };
+    console.log(returnJSON);
+    return res.send(returnJSON);
   }
 
   username = req.body.username;
   if (!username || !username.trim()) {
     res.statusCode = 403;
-    return res.send({
+    returnJSON = {
+      status: 403,
       error: "Forbidden you are not permitted to upload files."
-    });
+    };
+    console.log(returnJSON);
+    return res.send(returnJSON);
   }
 
   dbname = req.body.dbname;
   if (!dbname || !dbname.trim()) {
     res.statusCode = 422;
-    return res.send({
+    returnJSON = {
+      status: 422,
       error: "No database name was specified, upload cannot be processed."
-    });
+    };
+    console.log(returnJSON);
+    return res.send(returnJSON);
   }
 
   if (req.files.videoFile) {
     audioVideoFiles.push(req.files.videoFile);
   } else if (req.files.files && req.files.files.length > 0) {
-    audioVideoFiles = req.files.files;
+    audioVideoFiles = req.files.files[0];
+    // console.log(audioVideoFiles);
   } else {
     res.statusCode = 422;
-    return res.send({
+    returnJSON = {
+      status: 422,
       error: "No files were attached."
-    });
+    };
+    console.log(returnJSON);
+    return res.send(returnJSON);
   }
 
 
-  console.log("Generating wavs");
+  console.log(new Date() + " Generating textgrids ");
   audio.createWavAudioFromUpload(audioVideoFiles, dbname, node_config.audioVideoRawDir, node_config.audioVideoByCorpusDir)
     .then(function(result) {
-        audioVideoFiles = result;
+        console.log(new Date() + " Completed.");
+        // console.log(result);
+        for (var resultFileIndex = 0; resultFileIndex < result.length; resultFileIndex++) {
+          delete result[resultFileIndex].path;
+          delete result[resultFileIndex].currentWorkingDir;
+        }
 
-        console.log("Generating TextGrid");
-        // for (var fileindex = 0; fileindex < audioVideoFiles.length; fileindex++) {
-        //   //TODO
-        // }
+        audioVideoFiles = result;
       },
       function(reason) {
-        console.log("Error");
+        console.log(new Date() + " Error");
         console.log(reason);
       })
     .fin(function() {
-      res.send({
-        result: audioVideoFiles
-      });
+      returnJSON = {
+        status: 200,
+        files: audioVideoFiles
+      };
+      console.log(returnJSON);
+      res.send(returnJSON);
     });
 });
 
