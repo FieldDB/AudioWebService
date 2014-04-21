@@ -66,22 +66,6 @@ app.configure(function() {
   }));
 });
 
-// app.all('*', function(req, res, next) {
-//   console.log('got to the star');
-//   console.log('method: ' + req.method);
-//   if (!req.get('Origin'))
-//     return next();
-//   res.set('Access-Control-Allow-Origin', '*');
-//   res.set('Access-Control-Allow-Methods', 'GET, POST');
-//   res.set('Access-Control-Allow-Headers', 'Origin, X-File-Name, X-Requested-With, Content-Type');
-//   if ('OPTIONS' == req.method)
-//     return res.send(200);
-//   next();
-// });
-
-//API calls
-//app.options('/upload', cors()); // enable preflight
-//app.post('/upload', cors(corsOptions), function(req, res) {
 app.post('/upload/extract/utterances', function(req, res) {
   var audioVideoFiles = [],
     dbname,
@@ -349,33 +333,33 @@ app.get('/videofilenames', function(req, res) {
 });
 
 
-// app.get('/:dbname/:filebasename/:filename', function(req, res) {
+app.get('/:dbname/:filename', function(req, res) {
 
-//   console.log('got to the result file API');
-//   var dir = 'utterances/'; // your directory
+  console.log('got to the result file API');
+  var dir = 'utterances/'; // your directory
 
-//   // var files = fs.readdirSync(dir);
-//   // files.sort(function(a, b) {
-//   //   return fs.statSync(dir + a).mtime.getTime() -
-//   //     fs.statSync(dir + b).mtime.getTime();
-//   // });
-//   /* cached version */
-//   var files = fs.readdirSync(dir)
-//     .map(function(v) {
-//       return {
-//         name: v,
-//         time: fs.statSync(dir + v).mtime.getTime()
-//       };
-//     })
-//     .sort(function(a, b) {
-//       return a.time - b.time;
-//     })
-//     .map(function(v) {
-//       return v.name;
-//     });
-//   console.log(files);
-//   res.send(files);
-// });
+  // var files = fs.readdirSync(dir);
+  // files.sort(function(a, b) {
+  //   return fs.statSync(dir + a).mtime.getTime() -
+  //     fs.statSync(dir + b).mtime.getTime();
+  // });
+  /* cached version */
+  var files = fs.readdirSync(dir)
+    .map(function(v) {
+      return {
+        name: v,
+        time: fs.statSync(dir + v).mtime.getTime()
+      };
+    })
+    .sort(function(a, b) {
+      return a.time - b.time;
+    })
+    .map(function(v) {
+      return v.name;
+    });
+  console.log(files);
+  res.send(files);
+});
 
 
 /*
