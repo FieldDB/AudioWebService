@@ -333,32 +333,58 @@ app.get('/videofilenames', function(req, res) {
 });
 
 
-app.get('/:dbname/:filename', function(req, res) {
+app.get('/:dbname/:filename', function(req, response) {
+  var dbname = req.params.dbname;
+  if (!dbname || !dbname.trim() || dbname.indexOf(/[^a-zA-Z0-9_-]/) > -1) {
+    response.statusCode = 422;
+    returnJSON = {
+      status: 422,
+      userFriendlyErrors: ["No database was specified, request cannot be processed."]
+    };
+    console.log(returnJSON);
+    return response.send(returnJSON);
+  }
 
-  console.log('got to the result file API');
-  var dir = 'utterances/'; // your directory
+  var filename = req.params.filename;
+  if (!filename || !filename.trim() || filename.indexOf(/\//) > -1) {
+    response.statusCode = 422;
+    returnJSON = {
+      status: 422,
+      userFriendlyErrors: ["No filename was specified, request cannot be processed."]
+    };
+    console.log(returnJSON);
+    return response.send(returnJSON);
+  }
 
-  // var files = fs.readdirSync(dir);
-  // files.sort(function(a, b) {
-  //   return fs.statSync(dir + a).mtime.getTime() -
-  //     fs.statSync(dir + b).mtime.getTime();
-  // });
-  /* cached version */
-  var files = fs.readdirSync(dir)
-    .map(function(v) {
-      return {
-        name: v,
-        time: fs.statSync(dir + v).mtime.getTime()
-      };
-    })
-    .sort(function(a, b) {
-      return a.time - b.time;
-    })
-    .map(function(v) {
-      return v.name;
+  var fileBaseName = filename.substring(0, filename.lastIndexOf("."));
+  var fileWithPath = node_config.audioVideoByCorpusDir + "/" + dbname + "/" + fileBaseName + "/" + filename;
+  console.log(fileWithPath);
+  if (fs.existsSync(fileWithPath)) {
+    fs.readFile(fileWithPath, "binary", function(err, file) {
+      if (err) {
+        console.log(err);
+        response.statusCode = 500;
+        returnJSON = {
+          status: response.statusCode,
+          userFriendlyErrors: ["File cannot be served to you."]
+        };
+        console.log(returnJSON);
+        return response.send(returnJSON);
+      }
+      response.statusCode = 200;
+      // response.writeHead(200);
+      response.write(file, "binary");
+      return response.end();
     });
-  console.log(files);
-  res.send(files);
+  } else {
+    response.statusCode = 404;
+    returnJSON = {
+      status: response.statusCode,
+      userFriendlyErrors: ["Not found"]
+    };
+    console.log(returnJSON);
+    return response.send(returnJSON);
+  }
 });
 
 
