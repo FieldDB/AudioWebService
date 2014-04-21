@@ -9,6 +9,7 @@ var fs = require('fs');
 var express = require('express');
 var cors = require('cors');
 var app = express();
+var vidStreamer = require("vid-streamer");
 
 /*
  * Cross Origin Resource Sharing (CORS) Configuration, needed for for all HTML5
@@ -42,6 +43,14 @@ try {
   }
 }
 
+vidStreamer.settings({
+  "mode": "development",
+  "forceDownload": true,
+  "random": false,
+  "rootFolder": node_config.audioVideoRawDir,
+  "rootPath": node_config.audioVideoRawDir.replace(__dirname + "/", ""),
+  "server": "VidStreamer.js/0.1.4"
+});
 
 app.configure(function() {
   app.use(express.favicon());
@@ -360,22 +369,30 @@ app.get('/:dbname/:filename', function(req, response) {
   var fileWithPath = node_config.audioVideoByCorpusDir + "/" + dbname + "/" + fileBaseName + "/" + filename;
   console.log(fileWithPath);
   if (fs.existsSync(fileWithPath)) {
-    fs.readFile(fileWithPath, "binary", function(err, file) {
-      if (err) {
-        console.log(err);
-        response.statusCode = 500;
-        returnJSON = {
-          status: response.statusCode,
-          userFriendlyErrors: ["File cannot be served to you."]
-        };
-        console.log(returnJSON);
-        return response.send(returnJSON);
-      }
-      response.statusCode = 200;
-      // response.writeHead(200);
-      response.write(file, "binary");
-      return response.end();
-    });
+    if (filename.indexOf("TextGrid") === -1) {
+      /* stream everything that is not a textgrid */
+      var destinationSymLink = fs.readlinkSync(fileWithPath);
+      req.url = destinationSymLink.replace(__dirname, "");
+      vidStreamer(req, response);
+    } else {
+      /* serve textgrids */
+      fs.readFile(fileWithPath, "binary", function(err, file) {
+        if (err) {
+          console.log(err);
+          response.statusCode = 500;
+          returnJSON = {
+            status: response.statusCode,
+            userFriendlyErrors: ["File cannot be served to you."]
+          };
+          console.log(returnJSON);
+          return response.send(returnJSON);
+        }
+        response.statusCode = 200;
+        // response.writeHead(200);
+        response.write(file, "binary");
+        return response.end();
+      });
+    }
   } else {
     response.statusCode = 404;
     returnJSON = {
