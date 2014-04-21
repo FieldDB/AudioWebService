@@ -7,7 +7,7 @@ var shellPromises = require("./lib/shellPromises");
 var path = require('path');
 var fs = require('fs');
 var express = require('express');
-//var cors = require('cors');
+var cors = require('cors');
 var app = express();
 
 /*
@@ -45,6 +45,9 @@ try {
 
 app.configure(function() {
   app.use(express.favicon());
+  // app.use(cors({ origin: "chrome-extension://hdfkfcibgbjomikilhmkdpkcfpecakhd" }));
+  app.use(cors());
+  // app.use(app.router);
   app.use(express.compress());
   app.use(express.logger());
   app.use(express.limit(262144000)); // 250mb
@@ -54,8 +57,8 @@ app.configure(function() {
     multiples: 'true'
     // uploadDir: node_config.audioVideoRawDir
   }));
-  app.use('/utterances', express.directory(__dirname + '/utterances'));
-  app.use('/utterances', express.static(__dirname + '/utterances'));
+  // app.use('/utterances', express.directory(__dirname + '/utterances'));
+  // app.use('/utterances', express.static(__dirname + '/utterances'));
   app.use(express.methodOverride());
   app.use(express.errorHandler({
     dumpExceptions: true,
@@ -86,12 +89,13 @@ app.post('/upload/extract/utterances', function(req, res) {
     textGridCommand,
     returnJSON;
 
+  console.log(req.body);
   token = req.body.token;
   if (!token || !token.trim()) {
     res.statusCode = 403;
     returnJSON = {
       status: 403,
-      error: "Forbidden you are not permitted to upload files."
+      userFriendlyErrors: ["Forbidden you are not permitted to upload files."]
     };
     console.log(returnJSON);
     return res.send(returnJSON);
@@ -102,38 +106,44 @@ app.post('/upload/extract/utterances', function(req, res) {
     res.statusCode = 403;
     returnJSON = {
       status: 403,
-      error: "Forbidden you are not permitted to upload files."
+      userFriendlyErrors: ["Forbidden you are not permitted to upload files."]
     };
     console.log(returnJSON);
     return res.send(returnJSON);
   }
 
-  dbname = req.body.dbname;
+  dbname = req.body.dbname || req.body.pouchname || req.body.corpusidentifier;
   if (!dbname || !dbname.trim()) {
     res.statusCode = 422;
     returnJSON = {
       status: 422,
-      error: "No database name was specified, upload cannot be processed."
+      userFriendlyErrors: ["No database was specified, upload cannot be processed."]
     };
     console.log(returnJSON);
     return res.send(returnJSON);
   }
 
-  if (req.files.videoFile) {
+
+  if (req.files && req.files.videoFile) {
     audioVideoFiles.push(req.files.videoFile);
-  } else if (req.files.files && req.files.files.length > 0) {
-    audioVideoFiles = req.files.files[0];
-    // console.log(audioVideoFiles);
+  } else if (req.files && req.files.files && req.files.files.length > 0) {
+    audioVideoFiles = req.files.files;
+    console.log(audioVideoFiles);
+  } else if (req.files && req.files[0]) {
+    for (var fileIndex in req.files) {
+      audioVideoFiles.push(req.files[fileIndex]);
+    }
+    console.log(audioVideoFiles);
   } else {
     res.statusCode = 422;
     returnJSON = {
       status: 422,
-      error: "No files were attached."
+      userFriendlyErrors: ["No files were attached."]
     };
+    console.log(req);
     console.log(returnJSON);
     return res.send(returnJSON);
   }
-
 
   console.log(new Date() + " Generating textgrids ");
   audio.createWavAudioFromUpload(audioVideoFiles, dbname, node_config.audioVideoRawDir, node_config.audioVideoByCorpusDir)
@@ -143,12 +153,17 @@ app.post('/upload/extract/utterances', function(req, res) {
         for (var resultFileIndex = 0; resultFileIndex < result.length; resultFileIndex++) {
           delete result[resultFileIndex].path;
           delete result[resultFileIndex].currentWorkingDir;
+          delete result[resultFileIndex].uploadFileId;
         }
 
         audioVideoFiles = result;
       },
       function(reason) {
         console.log(new Date() + " Error");
+        audioVideoFiles = {
+          status: 500,
+          reason: reason
+        };
         console.log(reason);
       })
     .fin(function() {
@@ -332,6 +347,35 @@ app.get('/videofilenames', function(req, res) {
   console.log(files);
   res.send(files);
 });
+
+
+// app.get('/:dbname/:filebasename/:filename', function(req, res) {
+
+//   console.log('got to the result file API');
+//   var dir = 'utterances/'; // your directory
+
+//   // var files = fs.readdirSync(dir);
+//   // files.sort(function(a, b) {
+//   //   return fs.statSync(dir + a).mtime.getTime() -
+//   //     fs.statSync(dir + b).mtime.getTime();
+//   // });
+//   /* cached version */
+//   var files = fs.readdirSync(dir)
+//     .map(function(v) {
+//       return {
+//         name: v,
+//         time: fs.statSync(dir + v).mtime.getTime()
+//       };
+//     })
+//     .sort(function(a, b) {
+//       return a.time - b.time;
+//     })
+//     .map(function(v) {
+//       return v.name;
+//     });
+//   console.log(files);
+//   res.send(files);
+// });
 
 
 /*
