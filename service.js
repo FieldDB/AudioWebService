@@ -66,8 +66,8 @@ app.configure(function() {
     multiples: 'true'
     // uploadDir: node_config.audioVideoRawDir
   }));
-  // app.use('/utterances', express.directory(__dirname + '/utterances'));
-  // app.use('/utterances', express.static(__dirname + '/utterances'));
+  app.use('/utterances', express.directory(__dirname + '/bycorpus'));
+  app.use('/utterances', express.static(__dirname + '/bycorpus'));
   app.use(express.methodOverride());
   app.use(express.errorHandler({
     dumpExceptions: true,
