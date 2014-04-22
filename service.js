@@ -11,6 +11,7 @@ var cors = require('cors');
 var app = express();
 var vidStreamer = require("vid-streamer");
 
+var serviceVersion = "v1.102.3";
 /*
  * Cross Origin Resource Sharing (CORS) Configuration, needed for for all HTML5
  * clients running on any domain to contact this webservice.
@@ -147,6 +148,7 @@ app.post('/upload/extract/utterances', function(req, res) {
           delete result[resultFileIndex].path;
           delete result[resultFileIndex].currentWorkingDir;
           delete result[resultFileIndex].uploadFileId;
+          result[resultFileIndex].serviceVersion = serviceVersion;
         }
 
         audioVideoFiles = result;
@@ -369,30 +371,7 @@ app.get('/:dbname/:filename', function(req, response) {
   var fileWithPath = node_config.audioVideoByCorpusDir + "/" + dbname + "/" + fileBaseName + "/" + filename;
   console.log(fileWithPath);
   if (fs.existsSync(fileWithPath)) {
-    if (filename.indexOf("TextGrid") === -1) {
-      /* stream everything that is not a textgrid */
-      var destinationSymLink = fs.readlinkSync(fileWithPath);
-      req.url = destinationSymLink.replace(__dirname, "");
-      vidStreamer(req, response);
-    } else {
-      /* serve textgrids */
-      fs.readFile(fileWithPath, "binary", function(err, file) {
-        if (err) {
-          console.log(err);
-          response.statusCode = 500;
-          returnJSON = {
-            status: response.statusCode,
-            userFriendlyErrors: ["File cannot be served to you."]
-          };
-          console.log(returnJSON);
-          return response.send(returnJSON);
-        }
-        response.statusCode = 200;
-        // response.writeHead(200);
-        response.write(file, "binary");
-        return response.end();
-      });
-    }
+    response.sendfile(fileWithPath);
   } else {
     response.statusCode = 404;
     returnJSON = {
