@@ -3,7 +3,7 @@
 cd $FIELDDB_HOME/AudioWebService
 #bash switch_to_producti.sh
 
-$FIELDDB_HOME/AudioWebService/node_modules/forever/bin/forever \
+forever \
 start \
 -al $FIELDDB_HOME/logs/fielddbaudio.log \
 -ao $FIELDDB_HOME/logs/fielddbaudioout.log \
