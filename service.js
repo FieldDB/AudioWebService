@@ -60,12 +60,11 @@ app.configure(function() {
   // app.use(app.router);
   app.use(express.compress());
   app.use(express.logger());
-  app.use(express.limit(1610612736)); // 250mb
+  app.use(express.limit(262144000)); // 250mb
   app.use(express.bodyParser({
     hash: 'md5',
     autoFiles: 'true',
-    multiples: 'true',
-    limit: 1610612736
+    multiples: 'true'
     // uploadDir: node_config.audioVideoRawDir
   }));
   app.use('/utterances', express.directory(__dirname + '/bycorpus'));
