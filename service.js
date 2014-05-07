@@ -255,6 +255,7 @@ app.post('/upload', function(req, res) {
           });
           break;
         case 'application/octet-stream':
+          console.log(a);
           fs.rename(a.path, p3 + a.name, function(error) {
             if (error) {
               throw error;
@@ -272,7 +273,7 @@ app.post('/upload', function(req, res) {
   } catch (e) {
     console.loge(e);
   }
-  var command = 'cd $FIELDDB_HOME/' + 'Prosodylab-Aligner && ./align.py -d ./tmp/dictionary.txt ./tmp';
+  var command = 'cd $FIELDDB_HOME/' + 'Prosodylab-Aligner && ./align.py -t ./tmp -d ./tmp/dictionary.txt ./tmp';
   var child = exec(command, function(err, stdout, stderr) {
     if (err)
       throw err;
