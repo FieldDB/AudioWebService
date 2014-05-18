@@ -1,5 +1,5 @@
 var https = require('https');
-var node_config = require("./lib/nodeconfig_local");
+var node_config = require("./lib/nodeconfig_production");
 var audio = require("./lib/audio");
 var sys = require('sys');
 var exec = require('child_process').exec;
@@ -9,7 +9,6 @@ var fs = require('fs');
 var express = require('express');
 var cors = require('cors');
 var app = express();
-var vidStreamer = require("vid-streamer");
 
 var serviceVersion = "v1.102.3";
 /*
@@ -44,14 +43,6 @@ try {
   }
 }
 
-vidStreamer.settings({
-  "mode": "development",
-  "forceDownload": true,
-  "random": false,
-  "rootFolder": node_config.audioVideoRawDir,
-  "rootPath": node_config.audioVideoRawDir.replace(__dirname + "/", ""),
-  "server": "VidStreamer.js/0.1.4"
-});
 
 app.configure(function() {
   app.use(express.favicon());
@@ -393,6 +384,6 @@ app.get('/:dbname/:filename', function(req, response) {
 node_config.httpsOptions.key = fs.readFileSync(node_config.httpsOptions.key);
 node_config.httpsOptions.cert = fs.readFileSync(node_config.httpsOptions.cert);
 
-https.createServer(node_config.httpsOptions, app).listen(node_config.port);
-//app.listen(node_config.port);
+//https.createServer(node_config.httpsOptions, app).listen(node_config.port);
+app.listen(node_config.port);
 console.log('AudioWebService listening on port ' + node_config.port);
