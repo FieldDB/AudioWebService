@@ -141,7 +141,7 @@ app.post('/upload/extract/utterances', function(req, res) {
   }
 
   console.log(new Date() + " Generating textgrids ");
-  audio.createWavAudioFromUpload(audioVideoFiles, dbname, node_config.audioVideoRawDir, node_config.audioVideoByCorpusDir)
+  audio.createAudioFromUpload(audioVideoFiles, dbname, node_config.audioVideoRawDir, node_config.audioVideoByCorpusDir)
     .then(function(result) {
         console.log(new Date() + " Completed.");
         // console.log(result);
