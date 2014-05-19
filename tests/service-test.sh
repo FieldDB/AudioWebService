@@ -28,7 +28,7 @@ TESTCOUNTEXPECTED=4;
 
 echo "It should accept short audio"
 TESTCOUNT=$[TESTCOUNT + 1]
-curl -F files[]=@sphinx4files/lattice/10001-90210-01803.wav -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus https://localhost:3184/upload/extract/utterances ||{
+curl -k -F files[]=@sphinx4files/lattice/10001-90210-01803.wav -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus https://localhost:3184/upload/extract/utterances ||{
 	TESTFAILED=$[TESTFAILED + 1]
   TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept short audio"
 };
@@ -36,21 +36,21 @@ curl -F files[]=@sphinx4files/lattice/10001-90210-01803.wav -F token=mytokengoes
 echo "It should accept amr audio from androids"
 TESTCOUNT=$[TESTCOUNT + 1]
 mv 13157700051593730_2011-09-11_15.41_1315770072221_.mp3 13157700051593730_2011-09-11_15.41_1315770072221_.amr
-curl -F files[]=@13157700051593730_2011-09-11_15.41_1315770072221_.amr -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus https://localhost:3184/upload/extract/utterances ||{
+curl -k -F files[]=@13157700051593730_2011-09-11_15.41_1315770072221_.amr -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus https://localhost:3184/upload/extract/utterances ||{
 	TESTFAILED=$[TESTFAILED + 1]
   TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept amr audio from androids"
 };
 
 echo "It should accept multiple files"
 TESTCOUNT=$[TESTCOUNT + 1]
-curl -F files=@$HOME/Documents/georgian/phrases/alo.mp3 -F files=@$HOME/Documents/georgian/phrases/ara.mp3 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus https://localhost:3184/upload/extract/utterances ||{
+curl -k -F files=@$HOME/Documents/georgian/phrases/alo.mp3 -F files=@$HOME/Documents/georgian/phrases/ara.mp3 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus https://localhost:3184/upload/extract/utterances ||{
 	TESTFAILED=$[TESTFAILED + 1]
   TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept multiple files"
 };
 
 echo "It should accept long movies"
 TESTCOUNT=$[TESTCOUNT + 1]
-curl -F files[]=@$HOME/Documents/georgian/elicitation_sessions/ჩემი\ ცოლის\ დაქალის\ ქორწილი\ \[HD\].mp4 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus https://localhost:3184/upload/extract/utterances ||{
+curl -k -F files[]=@$HOME/Documents/georgian/elicitation_sessions/ჩემი\ ცოლის\ დაქალის\ ქორწილი\ \[HD\].mp4 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus https://localhost:3184/upload/extract/utterances ||{
 	TESTFAILED=$[TESTFAILED + 1]
   TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept long movies"
 };
@@ -81,4 +81,4 @@ fi
 # 	mv "noqata_tusunayawami.mp3?raw=true" noqata_tusunayawami.mp3
 # }
 
-# 86446
+# 15602

@@ -11,6 +11,12 @@ Install the module with: `npm install fielddb-audio-service` or by cloning this 
 node audio-service.js &
 ```
 
+Run the tests to see if your machine is set up:
+
+```bash
+npm test
+```
+
 ### Upload using curl or shell script 
 
 ```bash
@@ -209,6 +215,9 @@ See the test for current examples.
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Jasmine Node](http://jasmine.github.io/).
 
+```bash
+npm test
+```
 
 ## Release History
 * v0.1 Sept 16 2011 Audio upload and sphinx execution for Android client 

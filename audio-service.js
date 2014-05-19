@@ -384,7 +384,9 @@ app.get('/:dbname/:filename', function(req, response) {
  */
 node_config.httpsOptions.key = fs.readFileSync(node_config.httpsOptions.key);
 node_config.httpsOptions.cert = fs.readFileSync(node_config.httpsOptions.cert);
-
-https.createServer(node_config.httpsOptions, app).listen(node_config.port);
-//app.listen(node_config.port);
+if (deploy_target === "local") {
+  https.createServer(node_config.httpsOptions, app).listen(node_config.port);
+} else {
+  app.listen(node_config.port);
+}
 console.log('AudioWebService listening on port ' + node_config.port);
