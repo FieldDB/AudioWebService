@@ -76,7 +76,7 @@ app.post('/upload/extract/utterances', function(req, res) {
     textGridCommand,
     returnJSON;
 
-  console.log(req.body);
+  // console.log(req.body);
   token = req.body.token;
   if (!token || !token.trim()) {
     res.statusCode = 403;
@@ -115,12 +115,12 @@ app.post('/upload/extract/utterances', function(req, res) {
     audioVideoFiles.push(req.files.videoFile);
   } else if (req.files && req.files.files && req.files.files.length > 0) {
     audioVideoFiles = req.files.files;
-    console.log(audioVideoFiles);
+    // console.log(audioVideoFiles);
   } else if (req.files && req.files[0]) {
     for (var fileIndex in req.files) {
       audioVideoFiles.push(req.files[fileIndex]);
     }
-    console.log(audioVideoFiles);
+    // console.log(audioVideoFiles);
   } else {
     res.statusCode = 422;
     returnJSON = {
