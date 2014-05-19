@@ -10,4 +10,6 @@ start \
 -ae $FIELDDB_HOME/logs/fielddbaudioerr.log \
 audio-service.js
 
+echo "Running tests to be sure all is well..."
+npm test
 
