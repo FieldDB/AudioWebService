@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd $FIELDDB_HOME/AudioWebService
-#bash switch_to_producti.sh
+#NODE_DEPLOY_TARGET="production"
 
 forever \
 start \

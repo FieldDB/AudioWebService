@@ -1,5 +1,6 @@
 var https = require('https');
-var node_config = require("./lib/nodeconfig_localhost");
+var deploy_target = process.env.NODE_DEPLOY_TARGET || "local";
+var node_config = require("./lib/nodeconfig_" + deploy_target);
 var audio = require("./lib/audio");
 var sys = require('sys');
 var exec = require('child_process').exec;
