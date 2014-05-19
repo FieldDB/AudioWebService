@@ -1,5 +1,5 @@
 {
-  "name": "FieldDBAudioService",
+  "name": "fielddb-audio-service",
   "version": "0.0.1",
   "dependencies": {
     "cors": "latest",
@@ -12,5 +12,8 @@
     "checksum": "^0.1.1",
     "vid-streamer": "^0.1.4",
     "praat-scripts": "^4.0.6"
+  },
+  "scripts": {
+    "test": "bash tests/service-test.sh"
   }
 }

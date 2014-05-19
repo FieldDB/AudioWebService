@@ -11,7 +11,7 @@ var cors = require('cors');
 var app = express();
 var vidStreamer = require("vid-streamer");
 
-var serviceVersion = "v1.102.3";
+var serviceVersion = "v2.2.0";
 /*
  * Cross Origin Resource Sharing (CORS) Configuration, needed for for all HTML5
  * clients running on any domain to contact this webservice.
