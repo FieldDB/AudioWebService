@@ -8,6 +8,6 @@ start \
 -al $FIELDDB_HOME/logs/fielddbaudio.log \
 -ao $FIELDDB_HOME/logs/fielddbaudioout.log \
 -ae $FIELDDB_HOME/logs/fielddbaudioerr.log \
-service.js
+audio-service.js
 
 

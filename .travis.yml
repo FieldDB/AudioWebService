@@ -4,4 +4,4 @@ node_js:
   - '0.10'
 before_script:
   - 'npm install'
-  - 'node service.js &'
+  - 'node audio-service.js &'

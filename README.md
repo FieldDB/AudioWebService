@@ -8,7 +8,7 @@ A small service which can run the [Sphinx latice demo](https://www.assembla.com/
 Install the module with: `npm install fielddb-audio-service` or by cloning this repository `git clone https://github.com/OpenSourceFieldlinguistics/AudioWebService.git`
 
 ```bash
-node service.js &
+node audio-service.js &
 ```
 
 ### Upload using curl or shell script 
