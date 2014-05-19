@@ -1,5 +1,5 @@
 var https = require('https');
-var node_config = require("./lib/nodeconfig_local");
+var node_config = require("./lib/nodeconfig_localhost");
 var audio = require("./lib/audio");
 var sys = require('sys');
 var exec = require('child_process').exec;
@@ -9,7 +9,6 @@ var fs = require('fs');
 var express = require('express');
 var cors = require('cors');
 var app = express();
-var vidStreamer = require("vid-streamer");
 
 var serviceVersion = "v2.2.0";
 /*
@@ -44,14 +43,6 @@ try {
   }
 }
 
-vidStreamer.settings({
-  "mode": "development",
-  "forceDownload": true,
-  "random": false,
-  "rootFolder": node_config.audioVideoRawDir,
-  "rootPath": node_config.audioVideoRawDir.replace(__dirname + "/", ""),
-  "server": "VidStreamer.js/0.1.4"
-});
 
 app.configure(function() {
   app.use(express.favicon());
