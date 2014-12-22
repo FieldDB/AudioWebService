@@ -1,13 +1,46 @@
- l$ gcc -o hello_ps hello_ps.c -DMODELDIR=\"`pkg-config --variable=modeldir pocketsphinx`\" `pkg-config --cflags --libs pocketsphinx sphinxbase`
- gina@tower110103:~/Downloads/pocketsphinx/testinstall$ ls
- goforward.raw  hello_ps  hello_ps.c
- gina@tower110103:~/Downloads/pocketsphinx/testinstall$ ./hello_ps 
- INFO: cmd_ln.c(691): Parsing command line:
- \
- 	-hmm /usr/local/share/pocketsphinx/model/hmm/en_US/hub4wsj_sc_8k \
- 	-lm /usr/local/share/pocketsphinx/model/lm/en/turtle.DMP \
- 	-dict /usr/local/share/pocketsphinx/model/lm/en/turtle.dic 
- 
+#!/bin/bash 
+
+
+PROJECT_ROOT="$HOME/batumihome"
+NON_GLOBAL_BIN_DIR=$PROJECT_ROOT/.bin
+
+echo "PROJECT_ROOT $PROJECT_ROOT"
+
+ls $NON_GLOBAL_BIN_DIR/bin/sphinx_fe || {
+	echo "downloading"
+	cd $PROJECT_ROOT
+	svn checkout svn://svn.code.sf.net/p/cmusphinx/code/trunk/sphinxbase sphinxbase
+	cd sphinxbase
+	# exit;
+	./autogen.sh &&
+	./configure --prefix=$NON_GLOBAL_BIN_DIR && 
+	make clean
+	make &&
+	make install || {
+		echo "sphinxbase failed";
+		exit 1;
+	}
+}
+
+ls $NON_GLOBAL_BIN_DIR/bin/pocketsphinx_batch || {	
+
+	echo "downloading"
+	cd $PROJECT_ROOT
+	svn checkout svn://svn.code.sf.net/p/cmusphinx/code/trunk/pocketsphinx pocketsphinx
+	cd pocketsphinx
+
+	./autogen.sh && 
+	./configure --prefix=$NON_GLOBAL_BIN_DIR  && 
+	make clean
+	make &&
+	make install || {
+		echo "pocketsphinx failed";
+		exit 1;
+	}
+}
+
+exit;
+
  Current configuration:
  [NAME]		[DEFLT]		[VALUE]
  -agc		none		none

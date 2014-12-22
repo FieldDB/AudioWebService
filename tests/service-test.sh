@@ -24,7 +24,7 @@ TESTCOUNT=0;
 TESTFAILED=0;
 TESTSFAILEDSTRING="";
 TESTPASSED=0;
-TESTCOUNTEXPECTED=4;
+TESTCOUNTEXPECTED=5;
 
 # Production server is using http behind nginx
 SERVER="https://localhost:3184";
@@ -62,6 +62,13 @@ TESTCOUNT=$[TESTCOUNT + 1]
 curl -k -F files[]=@$HOME/Documents/georgian/elicitation_sessions/ჩემი\ ცოლის\ დაქალის\ ქორწილი\ \[HD\].mp4 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus $SERVER/upload/extract/utterances ||{
 	TESTFAILED=$[TESTFAILED + 1]
   TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept long movies"
+};
+
+echo "It should accept .raw audio (from android pocketsphinx and other)"
+TESTCOUNT=$[TESTCOUNT + 1]
+curl -k -F files[]=@testinstallpocketsphinx/android_16k.raw -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus $SERVER/upload/extract/utterances ||{
+  TESTFAILED=$[TESTFAILED + 1]
+  TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept .raw audio (from android pocketsphinx and other)"
 };
 
 echo;
