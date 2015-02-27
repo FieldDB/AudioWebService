@@ -69,6 +69,10 @@ app.configure(function() {
   }));
 });
 
+app.get('/robots.txt', function(req, res){
+  res.type('text/plain');
+  res.send("User-agent: *\nDisallow: /");
+});
 app.post('/upload/extract/utterances', function(req, res) {
   var audioVideoFiles = [],
     dbname,
