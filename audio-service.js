@@ -11,7 +11,7 @@ var express = require('express');
 var cors = require('cors');
 var app = express();
 
-var serviceVersion = "v2.2.0";
+var serviceVersion = require("./package.json").version;
 /*
  * Cross Origin Resource Sharing (CORS) Configuration, needed for for all HTML5
  * clients running on any domain to contact this webservice.
@@ -393,4 +393,4 @@ if (deploy_target === "local") {
 } else {
   app.listen(node_config.port);
 }
-console.log('AudioWebService listening on port ' + node_config.port);
+console.log('AudioWebService v' + serviceVersion + ' listening on port ' + node_config.port);
