@@ -1,6 +1,6 @@
 {
   "name": "fielddb-audio-service",
-  "version": "2.44.22",
+  "version": "2.49.29",
   "dependencies": {
     "cors": "latest",
     "fs.extra": "~1.2.0",
