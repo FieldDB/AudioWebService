@@ -1,12 +1,14 @@
 #!/bin/bash
 
 cd $FIELDDB_HOME/AudioWebService
-#NODE_DEPLOY_TARGET="production"
+NODE_DEPLOY_TARGET="production"
 
-pm2 \
+forever \
 start \
+-al $FIELDDB_HOME/logs/fielddbaudio.log \
+-ao $FIELDDB_HOME/logs/fielddbaudioout.log \
+-ae $FIELDDB_HOME/logs/fielddbaudioerr.log \
 audio-service.js
 
 echo "Running tests to be sure all is well..."
 npm test
-

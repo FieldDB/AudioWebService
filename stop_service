@@ -1,1 +1,1 @@
-pm2 stop audio-service.js
+forever stop audio-service.js
