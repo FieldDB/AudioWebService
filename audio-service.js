@@ -57,8 +57,8 @@ app.configure(function() {
     hash: 'md5',
     autoFiles: 'true',
     multiples: 'true',
-    limit: 1610612736
-    // uploadDir: node_config.audioVideoRawDir
+    limit: 1610612736,
+    uploadDir: '/data/tmp'
   }));
   app.use('/utterances', express.directory(__dirname + '/bycorpus'));
   app.use('/utterances', express.static(__dirname + '/bycorpus'));
