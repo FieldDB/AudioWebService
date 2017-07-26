@@ -1,11 +1,11 @@
-[![Build Status](https://travis-ci.org/OpenSourceFieldlinguistics/AudioWebService.png)](https://travis-ci.org/OpenSourceFieldlinguistics/AudioWebService)
+[![Build Status](https://travis-ci.org/FieldDB/AudioWebService.png)](https://travis-ci.org/FieldDB/AudioWebService)
 # AudioWebService
 
-A small service which can run the [Sphinx latice demo](https://www.assembla.com/code/sonido/subversion/nodes/7/sphinx4/src/apps/edu/cmu/sphinx/demo/lattice/LatticeDemo.java), the [ProsodyLab](https://github.com/kylebgorman/Prosodylab-Aligner) aligner and various [Praat Scripts](https://github.com/OpenSourceFieldlinguistics/Praat-Scripts) to detect utterances and syllables in any file which contains an audio track. 
+A small service which can run the [Sphinx latice demo](https://www.assembla.com/code/sonido/subversion/nodes/7/sphinx4/src/apps/edu/cmu/sphinx/demo/lattice/LatticeDemo.java), the [ProsodyLab](https://github.com/kylebgorman/Prosodylab-Aligner) aligner and various [Praat Scripts](https://github.com/FieldDB/Praat-Scripts) to detect utterances and syllables in any file which contains an audio track. 
 
 ## How to use
 ### On the server
-Install the module with: `npm install fielddb-audio-service` or by cloning this repository `git clone https://github.com/OpenSourceFieldlinguistics/AudioWebService.git`
+Install the module with: `npm install fielddb-audio-service` or by cloning this repository `git clone https://github.com/FieldDB/AudioWebService.git`
 
 ```bash
 node audio-service.js &
@@ -21,11 +21,11 @@ npm test
 
 ```bash
 curl -F files=@$HOME/Documents/georgian/phrases/alo.mp3 
-	-F files=@$HOME/Documents/georgian/phrases/ara.mp3 
-	-F token=mytokengoeshere 
-	-F username=testingupload 
-	-F dbname=testingupload-firstcorpus 
-	https://localhost:3184/upload/extract/utterances 
+  -F files=@$HOME/Documents/georgian/phrases/ara.mp3 
+  -F token=mytokengoeshere 
+  -F username=testingupload 
+  -F dbname=testingupload-firstcorpus 
+  https://localhost:3184/upload/extract/utterances 
 
 ```
 
@@ -33,28 +33,28 @@ curl -F files=@$HOME/Documents/georgian/phrases/alo.mp3
 
 ```html
 <form class="form-inline button-group" id="uploadAudioForTextGridform" enctype="multipart/form-data" action="{{audioServerUrl}}/upload/extract/utterances" method="post">
-	<label>
-		<span>Import long audio/video elicitation session(s) </span>
-	</label>
-	<div class="input-prepend">
-		<span class="btn btn-default btn-file btn-info btn-mini">
-			<span>
-				<i class="icon-file"></i> 
-				Choose file(s)
-			</span>
-			<input id="uploadAudioForTextGridformFiles" type="file" multiple="true" name="files" value="Audio/Video files to be imported"/>
-		</span>
-	</div>
-	<div class="input-append">
-		<button class="btn btn-info btn-mini" type="submit">
-			<i class="icon-upload"></i>
-			<span> Upload</span>
-		</button>
-	</div>
-	<input class="hidden" type="text" name="token" value="{{audiouploadtoken}}"/>
-	<input class="hidden" type="text" name="username" value="{{username}}"/>
-	<input class="hidden" type="text" name="dbname" value="{{pouchname}}"/>
-	<input class="hidden" type="text" name="returnTextGrid" value="true"/>
+  <label>
+    <span>Import long audio/video elicitation session(s) </span>
+  </label>
+  <div class="input-prepend">
+    <span class="btn btn-default btn-file btn-info btn-mini">
+      <span>
+        <i class="icon-file"></i> 
+        Choose file(s)
+      </span>
+      <input id="uploadAudioForTextGridformFiles" type="file" multiple="true" name="files" value="Audio/Video files to be imported"/>
+    </span>
+  </div>
+  <div class="input-append">
+    <button class="btn btn-info btn-mini" type="submit">
+      <i class="icon-upload"></i>
+      <span> Upload</span>
+    </button>
+  </div>
+  <input class="hidden" type="text" name="token" value="{{audiouploadtoken}}"/>
+  <input class="hidden" type="text" name="username" value="{{username}}"/>
+  <input class="hidden" type="text" name="dbname" value="{{pouchname}}"/>
+  <input class="hidden" type="text" name="returnTextGrid" value="true"/>
 </form>
 ```
 
@@ -160,26 +160,26 @@ In your code, you can also use jQuery or Backbone to perform the upload and do s
 ```java
 HttpURLConnection urlConnection;
 try {
-	url = new URL(urlStringAuthenticationSession);
-	urlConnection = (HttpURLConnection) url.openConnection();
-	urlConnection.setRequestMethod("POST");
-	urlConnection
-	.setRequestProperty("Content-Type", "application/json");
-	urlConnection.setDoInput(true);
-	urlConnection.setDoOutput(true);
-	urlConnection.connect();
+  url = new URL(urlStringAuthenticationSession);
+  urlConnection = (HttpURLConnection) url.openConnection();
+  urlConnection.setRequestMethod("POST");
+  urlConnection
+  .setRequestProperty("Content-Type", "application/json");
+  urlConnection.setDoInput(true);
+  urlConnection.setDoOutput(true);
+  urlConnection.connect();
 } catch (MalformedURLException e) {
-	e.printStackTrace();
-	this.userFriendlyErrorMessage = "Problem determining which server to contact, please report this error.";
-	return null;
+  e.printStackTrace();
+  this.userFriendlyErrorMessage = "Problem determining which server to contact, please report this error.";
+  return null;
 } catch (ProtocolException e) {
-	this.userFriendlyErrorMessage = "Problem using POST, please report this error.";
-	e.printStackTrace();
-	return null;
+  this.userFriendlyErrorMessage = "Problem using POST, please report this error.";
+  e.printStackTrace();
+  return null;
 } catch (IOException e) {
-	this.userFriendlyErrorMessage = "Problem opening connection to server, please report this error.";
-	e.printStackTrace();
-	return null;
+  this.userFriendlyErrorMessage = "Problem opening connection to server, please report this error.";
+  e.printStackTrace();
+  return null;
 }
 JsonObject jsonParam = new JsonObject();
 jsonParam.addProperty("token", token);
@@ -189,16 +189,16 @@ jsonParam.addProperty("returnTextGrid", returnTextGrid);
 
 DataOutputStream printout;
 try {
-	printout = new DataOutputStream(urlConnection.getOutputStream());
-	String jsonString = jsonParam.toString();
-	Log.d(Config.TAG, jsonString);
-	printout.write(jsonString.getBytes());
-	printout.flush();
-	printout.close();
+  printout = new DataOutputStream(urlConnection.getOutputStream());
+  String jsonString = jsonParam.toString();
+  Log.d(Config.TAG, jsonString);
+  printout.write(jsonString.getBytes());
+  printout.flush();
+  printout.close();
 } catch (IOException e) {
-	e.printStackTrace();
-	this.userFriendlyErrorMessage = "Problem writing to the server connection.";
-	return null;
+  e.printStackTrace();
+  this.userFriendlyErrorMessage = "Problem writing to the server connection.";
+  return null;
 }
 String JSONResponse = this.processResponse(url, urlConnection);
 
