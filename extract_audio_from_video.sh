@@ -10,7 +10,7 @@ cd $WORK
 
 # Extract any audio from the video track and 
 # convert it to 16-bit WAV format.
-ffmpeg -i $WORK/$2 -vn -acodec libmp3lame -ac 1 -ab 128k $WORK/$1.mp3
+avconv -i $WORK/$2 -vn -acodec libmp3lame -ac 1 -ab 128k $WORK/$1.mp3
 echo "Conversion complete."
 
 
