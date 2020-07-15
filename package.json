@@ -2,17 +2,20 @@
   "name": "fielddb-audio-service",
   "version": "3.16.13",
   "dependencies": {
-    "cors": "latest",
-    "fs.extra": "~1.2.0",
-    "express": "~3.3.2",
-    "fs-extra": "~0.6.3",
-    "q": "1.0.1",
-    "mkdirp": "0.3.5",
-    "sha1": "1.1.0",
-    "checksum": "0.1.1",
-    "praat-scripts": "4.0.7"
+    "body-parser": "^1.19.0",
+    "checksum": "^0.1.1",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "errorhandler": "^1.5.1",
+    "express": "^4.17.1 ",
+    "mkdirp": "^1.0.4",
+    "morgan": "^1.10.0",
+    "praat-scripts": "4.0.7",
+    "q": "^1.5.1",
+    "serve-index": "^1.9.1"
   },
   "scripts": {
-    "test": "bash tests/service-test.sh"
+    "test": "bash tests/service-test.sh",
+    "start": "node audio-service.js"
   }
 }
