@@ -1,6 +1,8 @@
 language: node_js
 node_js:
-  - '0.10'
+  - 4
+  - 12
+
 before_script:
   - 'npm install'
   - 'node audio-service.js &'
