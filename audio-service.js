@@ -58,7 +58,8 @@ app.use(morgan("combined"));
 app.use(bodyParser.json());
 app.use('/utterances', express.static(__dirname + '/bycorpus'));
 app.use('/utterances', express.static(__dirname + '/bycorpus'), serveIndex(__dirname + '/bycorpus', {
-  'icons': true
+  icons: true,
+  template: 'public/directory.html',
 }));
 app.use(errorHandler({
   dumpExceptions: true,
