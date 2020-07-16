@@ -68,7 +68,7 @@ curl -k -F files=@tests/data/alo.mp3 -F files=@tests/data/ara.mp3 -F token=mytok
 echo ""
 echo ""
 echo "It should accept long movies $TRAVIS"
-if [ $TRAVIS = true ]; then
+if [ $TRAVIS ]; then
   echo "  skipping due to large file not present in TRAVIS: $TRAVIS"
   TESTCOUNTEXPECTED=4
 else
