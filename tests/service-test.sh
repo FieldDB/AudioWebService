@@ -83,12 +83,14 @@ else
   coloredEcho  "$TESTPASSED passed of $TESTCOUNT" red
   coloredEcho  " $TESTFAILED tests failed" red
   coloredEcho " $TESTSFAILEDSTRING" red
+  exit $TESTFAILED
 fi
 
 if [ $TESTCOUNT = $TESTCOUNTEXPECTED ]; then
  coloredEcho  "Ran $TESTCOUNT of $TESTCOUNTEXPECTED expected" green
 else
 	coloredEcho  "Ran $TESTCOUNT of $TESTCOUNTEXPECTED expected" yellow
+  exit 1
 fi
 
 
