@@ -67,12 +67,17 @@ curl -k -F files=@tests/data/alo.mp3 -F files=@tests/data/ara.mp3 -F token=mytok
 
 echo ""
 echo ""
-echo "It should accept long movies"
-TESTCOUNT=$[TESTCOUNT + 1]
-curl -k -F files[]=@tests/data/ჩემი\ ცოლის\ დაქალის\ ქორწილი\ \[HD\].mp4 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus $SERVER/upload/extract/utterances | grep averageSylableDuration ||{
-	TESTFAILED=$[TESTFAILED + 1]
-  TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept long movies"
-};
+echo "It should accept long movies $TRAVIS"
+if [ $TRAVIS = true ]; then
+  echo "  skipping due to large file not present in TRAVIS: $TRAVIS"
+  TESTCOUNTEXPECTED=4
+else
+  TESTCOUNT=$[TESTCOUNT + 1]
+  curl -k -F files[]=@tests/data/ჩემი\ ცოლის\ დაქალის\ ქორწილი\ \[HD\].mp4 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus $SERVER/upload/extract/utterances | grep averageSylableDuration ||{
+    TESTFAILED=$[TESTFAILED + 1]
+    TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept long movies"
+  };
+fi
 
 echo ""
 echo ""
