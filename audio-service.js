@@ -1,17 +1,23 @@
+var compression = require("compression");
+var bodyParser = require('body-parser');
+var errorHandler = require('errorhandler');
 var https = require('https');
 var deploy_target = process.env.NODE_DEPLOY_TARGET || "local";
 var node_config = require("./lib/nodeconfig_" + deploy_target);
 var audio = require("./lib/audio");
-var sys = require('sys');
 var exec = require('child_process').exec;
+var morgan = require("morgan");
 var shellPromises = require("./lib/shellPromises");
 var path = require('path');
 var fs = require('fs');
 var express = require('express');
 var cors = require('cors');
+var serveIndex = require('serve-index');
+
 var app = express();
 
 var serviceVersion = require("./package.json").version;
+var multipartMiddleware = require("./middleware/multipartParser");
 /*
  * Cross Origin Resource Sharing (CORS) Configuration, needed for for all HTML5
  * clients running on any domain to contact this webservice.
@@ -44,43 +50,33 @@ try {
   }
 }
 
-
-app.configure(function() {
-  app.use(express.favicon());
-  // app.use(cors({ origin: "chrome-extension://hdfkfcibgbjomikilhmkdpkcfpecakhd" }));
-  app.use(cors());
-  // app.use(app.router);
-  app.use(express.compress());
-  app.use(express.logger());
-  app.use(express.limit(1610612736)); // 250mb
-  app.use(express.bodyParser({
-    hash: 'md5',
-    autoFiles: 'true',
-    multiples: 'true',
-    limit: 1610612736,
-    uploadDir: '/data/tmp'
-  }));
-  app.use('/utterances', express.directory(__dirname + '/bycorpus'));
-  app.use('/utterances', express.static(__dirname + '/bycorpus'));
-  app.use(express.methodOverride());
-  app.use(express.errorHandler({
-    dumpExceptions: true,
-    showStack: true
-  }));
-});
+// app.use(cors({ origin: "chrome-extension://hdfkfcibgbjomikilhmkdpkcfpecakhd" }));
+app.use(cors());
+// app.use(app.router);
+app.use(compression())
+app.use(morgan("combined"));
+app.use(bodyParser.json());
+app.use('/utterances', express.static(__dirname + '/bycorpus'));
+app.use('/utterances', express.static(__dirname + '/bycorpus'), serveIndex(__dirname + '/bycorpus', {
+  icons: true,
+  template: 'public/directory.html',
+}));
+app.use(errorHandler({
+  dumpExceptions: true,
+  showStack: true
+}));
 
 app.get('/robots.txt', function(req, res){
   res.type('text/plain');
   res.send("User-agent: *\nDisallow: /");
 });
-app.post('/upload/extract/utterances', function(req, res) {
+app.post('/upload/extract/utterances', multipartMiddleware, function(req, res) {
   var audioVideoFiles = [],
     dbname,
     token,
     textGridCommand,
     returnJSON;
 
-  // console.log(req.body);
   token = req.body.token;
   if (!token || !token.trim()) {
     res.statusCode = 403;
@@ -125,13 +121,16 @@ app.post('/upload/extract/utterances', function(req, res) {
       audioVideoFiles.push(req.files[fileIndex]);
     }
     // console.log(audioVideoFiles);
+  } else if (req.files && req.files['files[]']) {
+    for (var fileIndex in req.files) {
+      audioVideoFiles.push(req.files[fileIndex]);
+    }
   } else {
     res.statusCode = 422;
     returnJSON = {
       status: 422,
       userFriendlyErrors: ["No files were attached."]
     };
-    console.log(req);
     console.log(returnJSON);
     return res.send(returnJSON);
   }
@@ -380,7 +379,6 @@ app.get('/:dbname/:filename', function(req, response) {
     return response.send(returnJSON);
   }
 });
-
 
 /*
  * HTTPS Configuration, needed for for all HTML5 chrome app clients to contact
