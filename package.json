@@ -8,6 +8,7 @@
     "cors": "^2.8.5",
     "errorhandler": "^1.5.1",
     "express": "^4.17.1 ",
+    "formidable": "^1.2.2",
     "mkdirp": "^1.0.4",
     "morgan": "^1.10.0",
     "praat-scripts": "4.0.7",

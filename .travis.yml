@@ -6,3 +6,6 @@ node_js:
 before_script:
   - 'npm install'
   - 'node audio-service.js &'
+
+script:
+  - npm test

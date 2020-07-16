@@ -17,6 +17,7 @@ var serveIndex = require('serve-index');
 var app = express();
 
 var serviceVersion = require("./package.json").version;
+var multipartMiddleware = require("./middleware/multipartParser");
 /*
  * Cross Origin Resource Sharing (CORS) Configuration, needed for for all HTML5
  * clients running on any domain to contact this webservice.
@@ -55,13 +56,6 @@ app.use(cors());
 app.use(compression())
 app.use(morgan("combined"));
 app.use(bodyParser.json());
-app.use(bodyParser({
-  hash: 'md5',
-  autoFiles: 'true',
-  multiples: 'true',
-  limit: 1610612736,
-  uploadDir: '/data/tmp' // TODO body-parser doesnt support multipart upload
-}));
 serveIndex(__dirname + '/bycorpus', {
   // directory: '/utterances',
   icons: true
@@ -76,14 +70,13 @@ app.get('/robots.txt', function(req, res){
   res.type('text/plain');
   res.send("User-agent: *\nDisallow: /");
 });
-app.post('/upload/extract/utterances', function(req, res) {
+app.post('/upload/extract/utterances', multipartMiddleware, function(req, res) {
   var audioVideoFiles = [],
     dbname,
     token,
     textGridCommand,
     returnJSON;
 
-  // console.log(req.body);
   token = req.body.token;
   if (!token || !token.trim()) {
     res.statusCode = 403;
@@ -128,13 +121,16 @@ app.post('/upload/extract/utterances', function(req, res) {
       audioVideoFiles.push(req.files[fileIndex]);
     }
     // console.log(audioVideoFiles);
+  } else if (req.files && req.files['files[]']) {
+    for (var fileIndex in req.files) {
+      audioVideoFiles.push(req.files[fileIndex]);
+    }
   } else {
     res.statusCode = 422;
     returnJSON = {
       status: 422,
       userFriendlyErrors: ["No files were attached."]
     };
-    console.log(req);
     console.log(returnJSON);
     return res.send(returnJSON);
   }
