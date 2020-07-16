@@ -56,11 +56,10 @@ app.use(cors());
 app.use(compression())
 app.use(morgan("combined"));
 app.use(bodyParser.json());
-serveIndex(__dirname + '/bycorpus', {
-  // directory: '/utterances',
-  icons: true
-});
 app.use('/utterances', express.static(__dirname + '/bycorpus'));
+app.use('/utterances', express.static(__dirname + '/bycorpus'), serveIndex(__dirname + '/bycorpus', {
+  'icons': true
+}));
 app.use(errorHandler({
   dumpExceptions: true,
   showStack: true
@@ -379,7 +378,6 @@ app.get('/:dbname/:filename', function(req, response) {
     return response.send(returnJSON);
   }
 });
-
 
 /*
  * HTTPS Configuration, needed for for all HTML5 chrome app clients to contact
