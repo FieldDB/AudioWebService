@@ -120,6 +120,10 @@ app.post('/upload/extract/utterances', multipartMiddleware, function(req, res) {
       audioVideoFiles.push(req.files[fileIndex]);
     }
     // console.log(audioVideoFiles);
+  } else if (req.files && req.files['files[]']) {
+    for (var fileIndex in req.files) {
+      audioVideoFiles.push(req.files[fileIndex]);
+    }
   } else {
     res.statusCode = 422;
     returnJSON = {

@@ -35,6 +35,8 @@ else
   echo "Using $SERVER"
 fi
 
+echo ""
+echo ""
 echo "It should accept short audio"
 TESTCOUNT=$[TESTCOUNT + 1]
 curl -k -F files[]=@sphinx4files/lattice/10001-90210-01803.wav -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus $SERVER/upload/extract/utterances ||{
@@ -42,6 +44,8 @@ curl -k -F files[]=@sphinx4files/lattice/10001-90210-01803.wav -F token=mytokeng
   TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept short audio"
 };
 
+echo ""
+echo ""
 echo "It should accept amr audio from androids"
 TESTCOUNT=$[TESTCOUNT + 1]
 cp 13157700051593730_2011-09-11_15.41_1315770072221_.mp3 13157700051593730_2011-09-11_15.41_1315770072221_.amr
@@ -50,6 +54,8 @@ curl -k -F files[]=@13157700051593730_2011-09-11_15.41_1315770072221_.amr -F tok
   TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept amr audio from androids"
 };
 
+echo ""
+echo ""
 echo "It should accept multiple files"
 TESTCOUNT=$[TESTCOUNT + 1]
 curl -k -F files=@tests/data/alo.mp3 -F files=@tests/data/ara.mp3 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus $SERVER/upload/extract/utterances ||{
@@ -57,6 +63,8 @@ curl -k -F files=@tests/data/alo.mp3 -F files=@tests/data/ara.mp3 -F token=mytok
   TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept multiple files"
 };
 
+echo ""
+echo ""
 echo "It should accept long movies"
 TESTCOUNT=$[TESTCOUNT + 1]
 curl -k -F files[]=@tests/data/ჩემი\ ცოლის\ დაქალის\ ქორწილი\ \[HD\].mp4 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus $SERVER/upload/extract/utterances ||{
@@ -64,6 +72,8 @@ curl -k -F files[]=@tests/data/ჩემი\ ცოლის\ დაქალი
   TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept long movies"
 };
 
+echo ""
+echo ""
 echo "It should accept .raw audio (from android pocketsphinx and other)"
 TESTCOUNT=$[TESTCOUNT + 1]
 curl -k -F files[]=@testinstallpocketsphinx/android_16k.raw -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus $SERVER/upload/extract/utterances ||{
