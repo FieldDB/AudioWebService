@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ -z "$1" ]; then 
+if [ -z "$1" ]; then
   echo usage: $0 directory "Provide a file name (without the .srt, .amr, .wav suffixes)"
    exit
 fi
@@ -22,12 +22,12 @@ git checkout MachineTranscription
 git merge User
 
 echo ==Converting mp3/amr $1.amr to pcm/wav $1.wav
-avconv -y -i ../nodejs-pocketsphinxtemp/$1.amr ../nodejs-pocketsphinxtemp/$1.wav
+ffmpeg -y -i ../nodejs-pocketsphinxtemp/$1.amr ../nodejs-pocketsphinxtemp/$1.wav
 
 echo ==Running pocketsphinx
 echo "0:00:00.020,0:00:00.020\nResults of the machine transcription will appear below when ready.\n\n" >> $1.srt
-#170word gramamr: java -jar ../nodejs-pocketsphinx/sphinx4files/transcriber/bin/Transcriber.jar ../nodejs-pocketsphinxtemp/$1.wav 2>&1 | tee -a $1.srt 
-java -jar /home/gina/.groovy/lib/sphinx4/bin/LatticeDemo.jar ../nodejs-pocketsphinxtemp/$1.wav | grep "I heard:" | sed -e 's/I heard://' 2>&1 | tee -a $1.srt 
+#170word gramamr: java -jar ../nodejs-pocketsphinx/sphinx4files/transcriber/bin/Transcriber.jar ../nodejs-pocketsphinxtemp/$1.wav 2>&1 | tee -a $1.srt
+java -jar /home/gina/.groovy/lib/sphinx4/bin/LatticeDemo.jar ../nodejs-pocketsphinxtemp/$1.wav | grep "I heard:" | sed -e 's/I heard://' 2>&1 | tee -a $1.srt
 
 cp $1.srt ../nodejs-pocketsphinxtemp/$1_server.srt
 #cd ../nodejs-pocketsphinx/testinstallpocketsphinx
