@@ -16,6 +16,7 @@
     "serve-index": "^1.9.1"
   },
   "scripts": {
+    "pretest": "mkdir -p tests/data && wget https://speechdev.lingsync.org/utterances/community-georgian/alo/alo.mp3 -O tests/data/alo.mp3 && wget https://speechdev.lingsync.org/utterances/community-georgian/ara/ara.mp3 -O tests/data/ara.mp3",
     "test": "bash tests/service-test.sh",
     "start": "node audio-service.js"
   }

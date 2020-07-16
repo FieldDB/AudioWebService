@@ -52,14 +52,14 @@ curl -k -F files[]=@13157700051593730_2011-09-11_15.41_1315770072221_.amr -F tok
 
 echo "It should accept multiple files"
 TESTCOUNT=$[TESTCOUNT + 1]
-curl -k -F files=@$HOME/Documents/georgian/phrases/alo.mp3 -F files=@$HOME/Documents/georgian/phrases/ara.mp3 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus $SERVER/upload/extract/utterances ||{
+curl -k -F files=@tests/data/alo.mp3 -F files=@tests/data/ara.mp3 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus $SERVER/upload/extract/utterances ||{
 	TESTFAILED=$[TESTFAILED + 1]
   TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept multiple files"
 };
 
 echo "It should accept long movies"
 TESTCOUNT=$[TESTCOUNT + 1]
-curl -k -F files[]=@$HOME/Documents/georgian/elicitation_sessions/ჩემი\ ცოლის\ დაქალის\ ქორწილი\ \[HD\].mp4 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus $SERVER/upload/extract/utterances ||{
+curl -k -F files[]=@tests/data/ჩემი\ ცოლის\ დაქალის\ ქორწილი\ \[HD\].mp4 -F token=mytokengoeshere -F username=testingupload -F dbname=testingupload-firstcorpus $SERVER/upload/extract/utterances ||{
 	TESTFAILED=$[TESTFAILED + 1]
   TESTSFAILEDSTRING="$TESTSFAILEDSTRING : It should accept long movies"
 };

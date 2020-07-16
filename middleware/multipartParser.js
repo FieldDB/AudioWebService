@@ -6,14 +6,9 @@ function multipartMiddleware(req, res, next) {
       console.error(new Date() + 'Error', err)
       return next(err);
     }
-    req.body = fields;
 
-    console.log('fields', fields)
-    // console.log('Files', files)
+    req.body = fields;
     req.files = files;
-    for (const file of Object.entries(files)) {
-      // console.log(file)
-    }
 
     next();
   });
