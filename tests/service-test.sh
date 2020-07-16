@@ -30,7 +30,7 @@ TESTCOUNTEXPECTED=5;
 
 # Production server is using http behind nginx
 SERVER="https://localhost:3184";
-if [ "$NODE_DEPLOY_TARGET" == "production" ]; then
+if [ "$NODE_ENV" == "production" ]; then
   SERVER="http://localhost:3184";
   echo "Using $SERVER"
 else

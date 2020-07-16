@@ -1,5 +1,5 @@
 var formidable = require('formidable');
-var uploadDir = process.env.NODE_DEPLOY_TARGET === "production" ? '/data/tmp' : '/tmp';
+var uploadDir = process.env.NODE_ENV === "production" ? '/data/tmp' : '/tmp';
 
 console.log('Using upload dir of ' + uploadDir);
 function multipartMiddleware(req, res, next) {
