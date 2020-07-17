@@ -15,7 +15,7 @@ before_install:
 
 before_script:
   - 'npm install'
-  - 'NODE_DEPLOY_TARGET=local npm start &'
+  - 'NODE_ENV=local npm start &'
 
 script:
   - npm test
