@@ -2,8 +2,7 @@ var compression = require("compression");
 var bodyParser = require('body-parser');
 var errorHandler = require('errorhandler');
 var https = require('https');
-var deploy_target = process.env.NODE_ENV || "local";
-var node_config = require("./lib/nodeconfig_" + deploy_target);
+var config = require("config");
 var audio = require("./lib/audio");
 var exec = require('child_process').exec;
 var morgan = require("morgan");
@@ -28,7 +27,7 @@ var multipartMiddleware = require("./middleware/multipartParser");
 //  methods : "GET,PUT,POST"
 //};
 try {
-  fs.mkdirSync(node_config.audioVideoRawDir, function(data) {
+  fs.mkdirSync(config.audioVideoRawDir, function(data) {
     console.log("mkdir callback " + data);
   });
 } catch (e) {
@@ -39,7 +38,7 @@ try {
   }
 }
 try {
-  fs.mkdirSync(node_config.audioVideoByCorpusDir, function(data) {
+  fs.mkdirSync(config.audioVideoByCorpusDir, function(data) {
     console.log("mkdir callback " + data);
   });
 } catch (e) {
@@ -136,7 +135,7 @@ app.post('/upload/extract/utterances', multipartMiddleware, function(req, res) {
   }
 
   console.log(new Date() + " Generating textgrids ");
-  audio.createAudioFromUpload(audioVideoFiles, dbname, node_config.audioVideoRawDir, node_config.audioVideoByCorpusDir)
+  audio.createAudioFromUpload(audioVideoFiles, dbname, config.audioVideoRawDir, config.audioVideoByCorpusDir)
     .then(function(result) {
         console.log(new Date() + " Completed.");
         // console.log(result);
@@ -365,7 +364,7 @@ app.get('/:dbname/:filename', function(req, response) {
   }
 
   var fileBaseName = filename.substring(0, filename.lastIndexOf("."));
-  var fileWithPath = node_config.audioVideoByCorpusDir + "/" + dbname + "/" + fileBaseName + "/" + filename;
+  var fileWithPath = config.audioVideoByCorpusDir + "/" + dbname + "/" + fileBaseName + "/" + filename;
   console.log(fileWithPath);
   if (fs.existsSync(fileWithPath)) {
     response.sendfile(fileWithPath);
@@ -384,11 +383,9 @@ app.get('/:dbname/:filename', function(req, response) {
  * HTTPS Configuration, needed for for all HTML5 chrome app clients to contact
  * this webservice. As well as a general security measure.
  */
-node_config.httpsOptions.key = fs.readFileSync(node_config.httpsOptions.key);
-node_config.httpsOptions.cert = fs.readFileSync(node_config.httpsOptions.cert);
-if (deploy_target === "local") {
-  https.createServer(node_config.httpsOptions, app).listen(node_config.port);
+if (process.env.NODE_ENV === "production") {
+  app.listen(config.httpsOptions.port);
 } else {
-  app.listen(node_config.port);
+  https.createServer(config.httpsOptions, app).listen(config.httpsOptions.port);
 }
-console.log('AudioWebService v' + serviceVersion + ' listening on port ' + node_config.port);
+console.log('AudioWebService v' + serviceVersion + ' listening on port ' + config.httpsOptions.port);

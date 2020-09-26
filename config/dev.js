@@ -1,11 +1,5 @@
-exports.apphttpsdomain = "https://localhost:3184/";
-exports.port = "3184";
-exports.httpsOptions = {
-    key: 'fielddb_debug.key',
-    cert: 'fielddb_debug.crt'
+module.exports = {
+  audioVideoRawDir: path.resolve(__dirname, '../cache'),
+  audioVideoByCorpusDir: path.resolve(__dirname, '../data'),
+  languagesDir: path.resolve(__dirname, '../dialectmodels'),
 };
-exports.audioVideoByCorpusDir = __dirname + '/data';
-exports.languagesDir = __dirname + '/dialectmodels';
-exports.audioVideoRawDir = __dirname + '/../cache';
-exports.audioVideoByCorpusDir = __dirname + '/../data';
-exports.languagesDir = __dirname + '/../dialectmodels';
