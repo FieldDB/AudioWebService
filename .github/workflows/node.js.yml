@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 16.x]
+        node-version: [16.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -36,5 +36,5 @@ jobs:
     # - run: avconv -v || echo "avconv didnt install"
     - run: ffmpeg -version || echo "ffmpeg didnt install"
     - run: npm ci
-    - run: NODE_ENV=local npm start &
     - run: npm test || npm test
+    - run: NODE_ENV=local npm start &
