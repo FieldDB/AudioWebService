@@ -87,7 +87,7 @@ describe("post utterances", function() {
   });
 
   it("should accept amr audio from androids", function() {
-    this.timeout(8000);
+    this.timeout(20000);
     // cp 13157700051593730_2011-09-11_15.41_1315770072221_.mp3 13157700051593730_2011-09-11_15.41_1315770072221_.amr
     return supertest(service)
       .post("/upload/extract/utterances")
