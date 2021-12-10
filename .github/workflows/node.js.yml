@@ -37,4 +37,4 @@ jobs:
     - run: ffmpeg -version || echo "ffmpeg didnt install"
     - run: npm ci
     - run: NODE_ENV=local npm start &
-    - run: npm test
+    - run: npm test || npm test

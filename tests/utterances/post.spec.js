@@ -150,26 +150,46 @@ describe("post utterances", function() {
       .field("dbname", "testingupload-firstcorpus")
       .then(function(res) {
         expect(res.status).to.equal(200, JSON.stringify(res.body));
+        console.log(JSON.stringify(res.body.files[0]))
         expect(res.body).to.deep.equal({
           "status": 200,
           "files": [{
-            "size": 0,
+            "size": 31414,
             "name": "alo.mp3",
             "type": "audio/mpeg",
-            "mtime": null,
+            "mtime": res.body.files[0].mtime,
             "fileBaseName": "alo",
             "praatAudioExtension": ".mp3",
             "script": "Syllables",
             "dbname": "testingupload-firstcorpus",
-            "checksum": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+            "checksum": "ee87dd8f1e6a78e9b96cdf3e1b2ff8a964d10992",
             "uploadInfo": "new",
             "uploadStatus": 304,
-            "resultInfo": "File does not contain any audio stream",
-            "resultStatus": 422,
-            "textGridStatus": 422,
-            "textGridInfo": "File “alo.mp3” contains no audio data. You can import any audio/video file which contains an audio track. Are you sure this file has an audio track?",
-            "serviceVersion": "3.16.13"
-          }, {
+            "resultStatus": 304,
+            "resultInfo": "different",
+            "syllablesAndUtterances": {
+              "fileBaseName": "alo",
+              "syllableCount": "2",
+              "pauseCount": "0",
+              "totalDuration": "1.59",
+              "speakingTotalDuration": "0.72",
+              "speakingRate": "1.26",
+              "articulationRate": "2.78",
+              "averageSylableDuration": "0.360",
+              "scriptVersion": "v1.102.2",
+              "minimum_duration": 0.6,
+              "maximum_intensity": 59,
+              "minimum_pitch": 100,
+              "time_step": 0,
+              "window_size": 20,
+              "margin": 0.1
+            },
+              "textGridInfo": "regenerated",
+              "textGridStatus": 200,
+              "webResultStatus": 304,
+              "webResultInfo": "matches",
+              "serviceVersion": "3.16.13"
+            }, {
             "size": 18875,
             "name": "ara.mp3",
             "type": "audio/mpeg",
