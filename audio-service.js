@@ -31,8 +31,8 @@ try {
     console.log("mkdir callback " + data);
   });
 } catch (e) {
-  if (e.errno !== 47) {
-    console.log(e);
+  if ([47, -17].includes(e.errno0)) {
+    console.log(e.errno, e);
   } else {
     console.log("Dir was already ready.");
   }
@@ -42,8 +42,8 @@ try {
     console.log("mkdir callback " + data);
   });
 } catch (e) {
-  if (e.errno !== 47) {
-    console.log(e);
+  if ([47, -17].includes(e.errno0)) {
+    console.log(e.errno, e);
   } else {
     console.log("Dir was already ready.");
   }

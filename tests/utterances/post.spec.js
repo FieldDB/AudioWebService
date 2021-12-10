@@ -34,7 +34,7 @@ describe("post utterances", function() {
   });
 
   it("should accept short audio", function() {
-    console.log('service', service);
+    // console.log('service', service);
     return supertest(service)
       .post("/upload/extract/utterances")
       .attach("files[]", "sphinx4files/lattice/10001-90210-01803.wav")
