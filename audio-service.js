@@ -31,8 +31,8 @@ try {
     console.log("mkdir callback " + data);
   });
 } catch (e) {
-  if (e.errno !== 47) {
-    console.log(e);
+  if ([47, -17].includes(e.errno0)) {
+    console.log(e.errno, e);
   } else {
     console.log("Dir was already ready.");
   }
@@ -42,8 +42,8 @@ try {
     console.log("mkdir callback " + data);
   });
 } catch (e) {
-  if (e.errno !== 47) {
-    console.log(e);
+  if ([47, -17].includes(e.errno0)) {
+    console.log(e.errno, e);
   } else {
     console.log("Dir was already ready.");
   }
@@ -379,13 +379,17 @@ app.get('/:dbname/:filename', function(req, response) {
   }
 });
 
-/*
- * HTTPS Configuration, needed for for all HTML5 chrome app clients to contact
- * this webservice. As well as a general security measure.
- */
-if (process.env.NODE_ENV === "production") {
-  app.listen(config.httpsOptions.port);
-} else {
-  https.createServer(config.httpsOptions, app).listen(config.httpsOptions.port);
+if (!module.parent) {
+  /*
+   * HTTPS Configuration, needed for for all HTML5 chrome app clients to contact
+   * this webservice. As well as a general security measure.
+   */
+  if (process.env.NODE_ENV === "production") {
+    app.listen(config.httpsOptions.port);
+  } else {
+    https.createServer(config.httpsOptions, app).listen(config.httpsOptions.port);
+  }
+  console.log('AudioWebService v' + serviceVersion + ' listening on port ' + config.httpsOptions.port);
 }
-console.log('AudioWebService v' + serviceVersion + ' listening on port ' + config.httpsOptions.port);
+
+module.exports = app;

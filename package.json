@@ -17,8 +17,16 @@
     "serve-index": "^1.9.1"
   },
   "scripts": {
-    "pretest": "mkdir -p tests/data && wget https://speechdev.lingsync.org/utterances/community-georgian/alo/alo.mp3 -O tests/data/alo.mp3 && wget https://speechdev.lingsync.org/utterances/community-georgian/ara/ara.mp3 -O tests/data/ara.mp3",
-    "test": "bash tests/service-test.sh",
+    "coverage": "nyc npm test",
+    "pretest": "ls tests/data/alo.mp3 || (mkdir -p tests/data && curl https://speechdev.lingsync.org/utterances/community-georgian/alo/alo.mp3 -o tests/data/alo.mp3 && curl https://speechdev.lingsync.org/utterances/community-georgian/ara/ara.mp3 -o tests/data/ara.mp3); cp 13157700051593730_2011-09-11_15.41_1315770072221_.mp3 13157700051593730_2011-09-11_15.41_1315770072221_.amr",
+    "test": "rm -rf bycorpus/testingupload-firstcorpus/; mocha --recursive tests",
     "start": "node audio-service.js"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.2.0",
+    "nock": "^13.0.4",
+    "nyc": "^15.1.0",
+    "supertest": "^6.0.0"
   }
 }

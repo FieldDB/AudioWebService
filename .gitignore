@@ -96,6 +96,8 @@ target
 #*.log
 #*.sql
 #*.sqlite
+coverage
+.nyc_output
 
 # OS generated files #
 ######################

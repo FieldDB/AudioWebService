@@ -32,9 +32,9 @@ jobs:
     - run: which avconv || echo "avconv didnt install"
     # - run: sudo apt-get -y install libav-tools
     # - run: which avconv || echo "avconv didnt install"
-    - run: which ffmpeg || echo "ffmpeg didnt install"
+    - run: which ffmpeg
     # - run: avconv -v || echo "avconv didnt install"
-    - run: ffmpeg -version || echo "ffmpeg didnt install"
+    - run: ffmpeg -version
     - run: npm ci
+    - run: npm test || npm test
     - run: NODE_ENV=local npm start &
-    - run: npm test
