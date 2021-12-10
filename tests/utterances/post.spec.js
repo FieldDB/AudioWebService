@@ -102,7 +102,7 @@ describe("post utterances", function() {
           "files": [{
             "size": 3489389,
             "name": "13157700051593730_2011-09-11_15.41_1315770072221_.amr",
-            "type": "application/octet-stream",
+            "type": "audio/amr",
             "mtime": res.body.files[0].mtime,
             "fileBaseName": "13157700051593730_2011-09-11_15_41_1315770072221_",
             "praatAudioExtension": ".mp3",
