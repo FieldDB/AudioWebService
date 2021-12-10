@@ -30,10 +30,10 @@ jobs:
     - run: sudo apt-get -y install praat
     - run: sudo apt-get -y install ffmpeg
     - run: which avconv || echo "avconv didnt install"
-    - run: sudo apt-get -y install libav-tools
-    - run: which avconv || echo "avconv didnt install"
+    # - run: sudo apt-get -y install libav-tools
+    # - run: which avconv || echo "avconv didnt install"
     - run: which ffmpeg || echo "ffmpeg didnt install"
-    - run: avconv -v || echo "avconv didnt install"
+    # - run: avconv -v || echo "avconv didnt install"
     - run: ffmpeg -v || echo "ffmpeg didnt install"
     - run: npm ci
     - run: NODE_ENV=local npm start &
