@@ -23,10 +23,9 @@
     "start": "node audio-service.js"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "mocha": "^8.2.0",
-    "nock": "^13.0.4",
+    "chai": "^4.3.4",
+    "mocha": "^9.1.3",
     "nyc": "^15.1.0",
-    "supertest": "^6.0.0"
+    "supertest": "^6.1.6"
   }
 }
