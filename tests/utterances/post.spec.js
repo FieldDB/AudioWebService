@@ -87,7 +87,7 @@ describe("post utterances", function() {
   });
 
   it("should accept amr audio from androids", function() {
-    this.timeout(8000);
+    this.timeout(60 * 1000);
     // cp 13157700051593730_2011-09-11_15.41_1315770072221_.mp3 13157700051593730_2011-09-11_15.41_1315770072221_.amr
     return supertest(service)
       .post("/upload/extract/utterances")
@@ -232,8 +232,8 @@ describe("post utterances", function() {
 
   it("should accept long movies", function() {
     this.timeout(60 * 1000);
-    if (process.env.TRAVIS) {
-      console.log("  skipping due to large file not present in TRAVIS")
+    if (process.env.GITHUB_ACTIONS) {
+      console.log("  skipping due to large file not present in GITHUB_ACTIONS")
       this.skip();
     }
     return supertest(service)
