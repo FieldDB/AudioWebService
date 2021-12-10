@@ -34,7 +34,7 @@ jobs:
     # - run: which avconv || echo "avconv didnt install"
     - run: which ffmpeg || echo "ffmpeg didnt install"
     # - run: avconv -v || echo "avconv didnt install"
-    - run: ffmpeg -v || echo "ffmpeg didnt install"
+    - run: ffmpeg --help || echo "ffmpeg didnt install"
     - run: npm ci
     - run: NODE_ENV=local npm start &
     - run: npm test
