@@ -8,7 +8,7 @@
     "config": "^3.3.2",
     "cors": "^2.8.5",
     "errorhandler": "^1.5.1",
-    "express": "^4.17.1 ",
+    "express": "^4.17.3",
     "formidable": "^1.2.2",
     "mkdirp": "^1.0.4",
     "morgan": "^1.10.0",
